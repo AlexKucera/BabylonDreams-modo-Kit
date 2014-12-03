@@ -88,10 +88,10 @@ def makes_path(pathfile):
             os.makedirs(path)
             lx.out("Created folder: " + str(path))
     except:
-        lx.out("ERROR creating RenderOutput path for " + path)
+        lx.out("ERROR creating path for " + path)
 
 
-def get_render_output():
+def get_ids(itemtype):
     """
     Get a list of item IDs of type 'type'
     Returns a list of item IDs or None if there are no items of the specified
@@ -100,23 +100,27 @@ def get_render_output():
     """
     try:
         itemlist = []
-        numitems = lx.eval('!!query sceneservice renderOutput.N ?')
+        numitems = lx.eval('!!query sceneservice ' + itemtype + '.N ?')
         if numitems == 0:
             return None
         else:
             for x in xrange(numitems):
                 itemlist.append(
-                    lx.eval('query sceneservice renderOutput.ID ? %s' % x))
-            lx.out("Found " + str(numitems) + " RenderOutputs: " + ", ".join(
+                    lx.eval('query sceneservice ' + itemtype + '.ID ? %s' % x))
+            lx.out("Found " + str(numitems) + " " + itemtype + "s: " + ", ".join(
                 itemlist))
             return itemlist
     except:
-        lx.out("ERROR getRenderOutput")
+        lx.out("ERROR get_ids")
         return None
 
 
 # END FUNCTIONS -----------------------------------------------
 
+# TODO Split into three different scripts Switch Paths, Check Paths and Base Functions
+# TODO Split into Switch Paths
+# TODO Split Check Paths
+# TODO Split Base Functions
 
 # MAIN PROGRAM --------------------------------------------
 def main(justcreate):
@@ -132,7 +136,7 @@ def main(justcreate):
     unix_path = "/Volumes/ProjectsRaid/WorkingProjects"
     win_path = "E:\AzureSync\CloudComputing\WorkingProjects"
 
-    renderoutputs = get_render_output()
+    renderoutputs = get_ids("renderOutput")
 
     if renderoutputs:
 
