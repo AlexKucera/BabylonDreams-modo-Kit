@@ -29,7 +29,9 @@ import lx
 def main():
     try:
         # lx.trace(True)
-        lx.eval(r"scene.importReference /Volumes/ProjectsRaid/WorkingProjects/peri/peri-2014_000-sharedspace/work/modo/03_shader/x_shading.lxofalse true false false false")
+        lx.eval(r"scene.importReference "
+                r"/Volumes/ProjectsRaid/WorkingProjects/peri/peri-2014_000-sharedspace/work/modo/03_shader/x_shading.lxo "
+                r"false true false false false")
         n = lx.eval('query sceneservice mask.N ? all')
         for i in range(n):
             name = lx.eval("query sceneservice mask.name ? %s" % i)
