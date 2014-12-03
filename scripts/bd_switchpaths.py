@@ -29,26 +29,26 @@ import lx
 import sys
 
 
-def updateRenderOutput(renderOutput):
+def update_render_output(renderoutput):
     """
         Updates the Render Output path to work on Azure or OS X depending on
         the OS we are on.
     """
     try:
-        lx.eval(r"select.Item %s" % renderOutput)
-        oldPath = lx.eval("item.channel renderOutput$filename ?")
+        lx.eval(r"select.Item %s" % renderoutput)
+        oldpath = lx.eval("item.channel renderOutput$filename ?")
 
-        if oldPath != None:
-            lx.out(renderOutput + " has a set output path: " + oldPath)
-            newPath = format_filename(oldPath)
-            lx.out("Turned output path it into " + osType + " Path: " + newPath)
-            lx.eval(r'item.channel renderOutput$filename "%s"' % newPath)
+        if oldpath is not None:
+            lx.out(renderoutput + " has a set output path: " + oldpath)
+            newpath = format_filename(oldpath)
+            lx.out("Turned output path it into " + osType + " Path: " + newpath)
+            lx.eval(r'item.channel renderOutput$filename "%s"' % newpath)
 
-            #MakePath
-            makes_path(newPath)
+            # MakePath
+            makes_path(newpath)
 
-        elif oldPath == None:
-            lx.out(str(renderOutput) + " has no active filename.")
+        elif oldpath is None:
+            lx.out(str(renderoutput) + " has no active filename.")
 
     except:
         lx.out("Command updateRenderOutput failed with ", sys.exc_info())
@@ -72,16 +72,16 @@ def format_filename(s):
         return None
 
 
-def makes_path(pathFile):
+def makes_path(pathfile):
     """
     Check to make sure destination directory exists.
     If it doesn't create the directory.
     """
-    path = os.path.dirname(pathFile)
+    path = os.path.dirname(pathfile)
 
     try:
         exists = os.path.exists(path)
-        if exists == True:
+        if exists:
             lx.out(
                 "Tried creating folder \"" + path + "\", but it already exists.")
         else:
@@ -91,7 +91,7 @@ def makes_path(pathFile):
         lx.out("ERROR creating RenderOutput path for " + path)
 
 
-def getRenderOutput():
+def get_render_output():
     """
     Get a list of item IDs of type 'type'
     Returns a list of item IDs or None if there are no items of the specified
@@ -119,7 +119,7 @@ def getRenderOutput():
 
 
 # MAIN PROGRAM --------------------------------------------
-def main(justCreate):
+def main(justcreate):
     global osType
     global unix_path
     global win_path
@@ -132,20 +132,20 @@ def main(justCreate):
     unix_path = "/Volumes/ProjectsRaid/WorkingProjects"
     win_path = "E:\AzureSync\CloudComputing\WorkingProjects"
 
-    renderOutputs = getRenderOutput()
+    renderoutputs = get_render_output()
 
-    if renderOutputs:
+    if renderoutputs:
 
-        if justCreate == "switch":
-            for x in renderOutputs:
-                updateRenderOutput(x)
+        if justcreate == "switch":
+            for x in renderoutputs:
+                update_render_output(x)
         else:
-            for x in renderOutputs:
+            for x in renderoutputs:
                 lx.eval(r"select.Item %s" % x)
-                renderPath = lx.eval("item.channel renderOutput$filename ?")
-                if renderPath:
-                    lx.out(renderPath)
-                    makes_path(renderPath)
+                renderpath = lx.eval("item.channel renderOutput$filename ?")
+                if renderpath:
+                    lx.out(renderpath)
+                    makes_path(renderpath)
 
 
 # END MAIN PROGRAM -----------------------------------------------

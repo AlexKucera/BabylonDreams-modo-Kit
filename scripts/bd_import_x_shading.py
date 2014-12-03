@@ -34,8 +34,8 @@ def main():
         for i in range(n):
             name = lx.eval("query sceneservice mask.name ? %s" % i)
             if name == "x_shading (Item)":
-                id = lx.eval("query sceneservice mask.id ? %s" % i)
-                lx.eval("select.Item %s" % id)
+                maskid = lx.eval("query sceneservice mask.id ? %s" % i)
+                lx.eval("select.Item %s" % maskid)
                 lx.eval("mask.setMesh (all)")
 
     except:
