@@ -27,15 +27,15 @@ def main():
             if errorcode != 0 and chmoderror != 0:
                 lx.eval('layout.createOrClose EventLog "Event Log_layout" '
                         'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true')
-                lx.out("Locking failed with Error Codes: CHFLAGS(" + errorcode + ") and "
-                                                                                 "CHMOD(" + chmoderror + ")")
+                lx.out("ERROR Locking failed with Error Codes: CHFLAGS(" + errorcode +
+                       ") and CHMOD(" + chmoderror + ")")
             else:
                 lx.out("Successfully saved Config!")
         else:
             lx.eval('layout.createOrClose EventLog "Event Log_layout" '
                     'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true')
-            lx.out("Unlocking failed with Error Code: CHFLAGS(" + errorcode + ") and "
-                                                                              "CHMOD(" + chmoderror + ")")
+            lx.out("ERROR Unlocking failed with Error Code: CHFLAGS(" + errorcode +
+                   ") and CHMOD(" + chmoderror + ")")
     else:
         lx.out("Config not found")
 

@@ -21,7 +21,7 @@ def main():
     except:
         lx.eval('layout.createOrClose EventLog "Event Log_layout" '
                 'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true')
-        lx.out("Saving KIT UI Config failed with ", sys.exc_info())
+        lx.out("ERROR Saving KIT UI Config failed with ", sys.exc_info())
 
 
 # END MAIN PROGRAM -----------------------------------------------
