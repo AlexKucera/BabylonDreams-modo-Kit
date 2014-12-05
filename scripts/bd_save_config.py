@@ -1,5 +1,13 @@
-# python
-# coding=utf-8
+#!/usr/bin/env python
+# encoding: utf-8
+# Check Azure Paths
+# Alexander Kucera
+# babylondreams.de
+
+"""
+Saves the modo config, but keeps the config file locked
+to avoid accidental changes or corruption.
+"""
 
 import os
 import traceback
