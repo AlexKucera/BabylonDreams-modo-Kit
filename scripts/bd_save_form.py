@@ -24,6 +24,9 @@ def main():
         lx.eval("select.attr {83740604103:sheet} set")
         lx.eval(
             "attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams/configs/babylondreams_forms.cfg")
+        lx.eval("select.attr {35548411557:sheet} set")
+        lx.eval(
+            "attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams/configs/babylondreams_popup_form.cfg")
         lx.out("Successfully saved KIT UI Config!")
     except:
         lx.eval('layout.createOrClose EventLog "Event Log_layout" '
