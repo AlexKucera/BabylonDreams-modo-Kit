@@ -11,6 +11,7 @@ to avoid accidental changes or corruption.
 
 import os
 import traceback
+import sys
 
 import lx
 
@@ -28,7 +29,14 @@ def main():
         chmoderror = os.system("chmod 644 " + configpath)
         if errorcode == 0 and chmoderror == 0:
             lx.out("Saving Config…")
-            lx.eval("config.save")
+            try:
+                lx.eval("config.save")
+            except:
+                lx.eval('layout.createOrClose EventLog "Event Log_layout" '
+                        'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true '
+                        'open:true')
+                lx.out("ERROR Saving config failed with ", sys.exc_info())
+                
             lx.out("Locking Config…")
             chmoderror = os.system("chmod 444 " + configpath)
             errorcode = os.system("chflags uchg " + configpath)
