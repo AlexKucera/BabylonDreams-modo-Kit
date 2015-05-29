@@ -32,6 +32,8 @@ def main():
     groups = pyModo.Group_Name_All()
     passes = False
 
+    pyModo.Render_Count_All()
+
     for group in groups:
 
         if group == "passes":
@@ -39,11 +41,11 @@ def main():
 
     if passes:
         lx.out("Setting up proper Output Pattern: '[<pass>]_[<output>][<LR>].<FFFF>'")
-        lx.eval("select.Item polyRender008")
+        lx.eval("select.Item Render")
         lx.eval('item.channel outPat "[<pass>]_[<output>][<LR>].<FFFF>"')
     else:
         lx.out("Setting up proper Output Pattern: '[<pass>][<output>][<LR>].<FFFF>'")
-        lx.eval("select.Item polyRender008")
+        lx.eval("select.Item Render")
         lx.eval('item.channel outPat "[<pass>][<output>][<LR>].<FFFF>"')
 
     bd_utils.restoreSelection(save_selection)
