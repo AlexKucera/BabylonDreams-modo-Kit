@@ -56,10 +56,19 @@ def main():
         workingdirectory = wd_regex.match(filepath).group()
         lx.out("Project is located at: " + workingdirectory)
 
-        renderpath = workingdirectory + "img/cg/" + filename + "/" + filename + "_" + \
-                     version + "/"
+        turntable = ""
+        turntable_regex = re.compile("turntable")
+        if turntable_regex.search(filepath) or turntable_regex.search(filename) is not \
+                None:
+            turntable = "turntables/"
+
+        # renderpath = workingdirectory + "img/cg/" + turntable + filename + "/" + filename + "_" + version + "/"
+
+        renderpath = workingdirectory + "img/cg/" + filename + "/" + filename + "_" + version + "/"
+        renderpath = str.lower(renderpath)
 
         renderoutputpath = renderpath + filename + "_" + version + "_"
+        renderoutputpath = str.lower(renderoutputpath)
         lx.out("RenderOutput will be located at: " + renderoutputpath)
 
         renderoutputs = bd_utils.get_ids("renderOutput")
@@ -70,8 +79,15 @@ def main():
 
             for x in renderoutputs:
                 lx.eval(r"select.Item %s" % x)
-                fileformat = lx.eval("item.channel renderOutput$format ?")
-                if fileformat:
+                filename = lx.eval("item.channel renderOutput$filename ?")
+
+                if filename is not None:
+
+                    fileformat = lx.eval("item.channel renderOutput$format ?")
+
+                    if fileformat is None or "$FLEX":
+                        fileformat = "openexr"
+
                     lx.out("Setting Render Output path to: " + renderoutputpath)
                     lx.eval("item.channel renderOutput$filename " + renderoutputpath)
                     lx.out("Setting Render Output format to: " + fileformat)
