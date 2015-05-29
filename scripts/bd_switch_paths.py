@@ -47,6 +47,7 @@ def update_render_output(renderoutput):
 
                 # MakePath
                 bd_utils.makes_path(newpath)
+
             else:
                 lx.out("Old and new path are identical. No change necessary.")
 
@@ -93,7 +94,7 @@ def main():
     lx.out("TYPE OS: " + osType)
 
     unix_path = "/Volumes/ProjectsRaid/WorkingProjects"
-    win_path = "E:\AzureSync\CloudComputing\WorkingProjects"
+    win_path = "Z:\AzureSync\CloudComputing\WorkingProjects"
 
     save_selection = lx.evalN("query sceneservice selection ? all")
 
