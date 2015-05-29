@@ -55,7 +55,7 @@ def main():
         else:
             lx.out("Saving as Version " + version)
             try:
-                lx.eval('scene.saveAs {%s} export:1' % newfile)
+                lx.eval('scene.saveAs {%s}' % newfile)
             except:
                 lx.eval('layout.createOrClose EventLog "Event Log_layout" '
                         'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true '
