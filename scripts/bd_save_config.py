@@ -14,13 +14,15 @@ import traceback
 import sys
 
 import lx
+import shutil
 
 
 __author__ = 'alex'
 
+# Functions -----------------------------------------------
 
-# MAIN PROGRAM --------------------------------------------
-def main():
+
+def saveLock():
     configpath = lx.eval("query platformservice path.path ? configname")
     if os.path.isfile(configpath):
         lx.out("Found Config at: " + configpath)
@@ -36,7 +38,7 @@ def main():
                         'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true '
                         'open:true')
                 lx.out("ERROR Saving config failed with ", sys.exc_info())
-                
+
             lx.out("Locking Config…")
             chmoderror = os.system("chmod 444 " + configpath)
             errorcode = os.system("chflags uchg " + configpath)
@@ -54,6 +56,41 @@ def main():
                    ") and CHMOD(" + chmoderror + ")")
     else:
         lx.out("Config not found")
+
+
+def saveCopy():
+    configpath = lx.eval("query platformservice path.path ? configname")
+    if os.path.isfile(configpath):
+        lx.out("Found Config at: " + configpath)
+        lx.out("Saving Config…")
+        try:
+            lx.eval("config.save")
+            lx.out("Successfully saved Config!")
+        except:
+            lx.eval('layout.createOrClose EventLog "Event Log_layout" '
+                    'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true '
+                    'open:true')
+            lx.out("ERROR Saving config failed with ", sys.exc_info())
+
+        lx.out("Copying Config…")
+        try:
+            shutil.copy2(configpath, configpath + "_backup")
+        except:
+            lx.eval('layout.createOrClose EventLog "Event Log_layout" '
+                    'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true '
+                    'open:true')
+            lx.out("ERROR Backup failed with ", sys.exc_info())
+        lx.out("Copied backup config.")
+
+    else:
+        lx.out("Config not found")
+
+# END Functions -------------------------------------------
+
+
+# MAIN PROGRAM --------------------------------------------
+def main():
+    saveCopy()
 
 
 # END MAIN PROGRAM -----------------------------------------------
