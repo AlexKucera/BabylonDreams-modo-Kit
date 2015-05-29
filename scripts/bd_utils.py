@@ -29,7 +29,10 @@ def restoreSelection(listSelections):
     global save_selection
     save_selection = lx.evalN("query sceneservice selection ? all")
 
-    to save and later restore a selection in modo
+    to save and later restore a selection in modo with
+
+    bd_utils.restoreSelection(save_selection)
+
     """
 
     try:
