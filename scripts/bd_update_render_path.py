@@ -64,11 +64,11 @@ def main():
 
         # renderpath = workingdirectory + "img/cg/" + turntable + filename + "/" + filename + "_" + version + "/"
 
-        renderpath = workingdirectory + "img/cg/" + filename + "/" + filename + "_" + version + "/"
-        renderpath = str.lower(renderpath)
+        renderpath = workingdirectory + "img/cg/" + str.lower(filename) + "/" + \
+                     str.lower(filename) + "_" + str.lower(version) + "/"
 
-        renderoutputpath = renderpath + filename + "_" + version + "_"
-        renderoutputpath = str.lower(renderoutputpath)
+        renderoutputpath = renderpath + str.lower(filename) + "_" + str.lower(version) \
+                           + "_"
         lx.out("RenderOutput will be located at: " + renderoutputpath)
 
         renderoutputs = bd_utils.get_ids("renderOutput")
@@ -78,7 +78,7 @@ def main():
             bd_utils.makes_path(renderpath)
 
             for x in renderoutputs:
-                lx.eval(r"select.Item %s" % x)
+                lx.eval("select.Item \"%s\"" % x)
                 filename = lx.eval("item.channel renderOutput$filename ?")
 
                 if filename is not None:
