@@ -48,8 +48,8 @@ def main():
 
         filename = filename[0]
         filename = filename.rsplit("_", 1)
-        version = filename[1]
-        filename = filename[0]
+        version = str.lower(filename[1])
+        filename = str.lower(filename[0])
         lx.out('File "' + filename + '" is at Version ' + version + '.')
 
         wd_regex = re.compile("/Volumes/ProjectsRaid/WorkingProjects/[^/]*/[^/]*/")
@@ -64,12 +64,9 @@ def main():
 
         # renderpath = workingdirectory + "img/cg/" + turntable + filename + "/" + filename + "_" + version + "/"
 
-        renderpath = workingdirectory + "img/cg/" + str.lower(filename) + "/" + \
-                     str.lower(filename) + "_" + str.lower(version) + "/"
-
-        renderoutputpath = renderpath + str.lower(filename) + "_" + str.lower(version) \
-                           + "_"
-        lx.out("RenderOutput will be located at: " + renderoutputpath)
+        renderpath = workingdirectory + "img/cg/" + filename + "/" + \
+                     filename + "_" + version + "/"
+        lx.out("The renders will be located at: " + renderpath)
 
         renderoutputs = bd_utils.get_ids("renderOutput")
 
@@ -78,16 +75,26 @@ def main():
             bd_utils.makes_path(renderpath)
 
             for x in renderoutputs:
-                lx.eval("select.Item \"%s\"" % x)
-                filename = lx.eval("item.channel renderOutput$filename ?")
 
-                if filename is not None:
+                lx.eval("select.Item \"%s\"" % x)
+                filepath = lx.eval("item.channel renderOutput$filename ?")
+
+                if filepath is not None:
 
                     fileformat = lx.eval("item.channel renderOutput$format ?")
 
                     if fileformat is None or "$FLEX":
                         fileformat = "openexr"
 
+                    if x == "rgba":
+                        renderpasspath = renderpath
+                    else:
+                        renderpasspath = renderpath + x + "/"
+
+                    renderoutputpath = renderpasspath + filename + "_" + version + "_"
+                    lx.out("RenderOutput " + x + " will be located at: " +
+                           renderpasspath)
+                    bd_utils.makes_path(renderpasspath)
                     lx.out("Setting Render Output path to: " + renderoutputpath)
                     lx.eval("item.channel renderOutput$filename " + renderoutputpath)
                     lx.out("Setting Render Output format to: " + fileformat)
