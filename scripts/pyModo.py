@@ -4,7 +4,7 @@
 # pyModo
 #Author Keith Sheppard
 #Contributors - Oleg (aka: ThirteenthGuest)
-#4/21/2015 7:05:46 PM
+#6/8/2015 6:18:23 PM
 
 
 import lx
@@ -12,6 +12,8 @@ import sys
 import math
 import random
 import string
+import glob
+import os
 import pyModoT as mt
 
 
@@ -15013,6 +15015,94 @@ def __fn_pyModo_Scene_Main(varCheck, *args):
 
 ####################################################
 ####################################################
+
+def Batch_File_Conversion():
+    strSelect = ''
+    batchChoice = ''
+
+    extList = ['OBJ', 'LXO', 'LWO', 'FBX', 'DAE', 'ABC']
+
+    for extFrom in extList:
+        for extTo in extList:
+            if extTo != extFrom:
+                strSelect = strSelect + extFrom + '<TO>' + extTo + ';'
+
+    strSelect = strSelect[:len(strSelect) - 1]
+    batchChoice = Modo_UserChoice_Selection(strSelect)
+    fileType_From = batchChoice[:batchChoice.index('<')]
+    fileType_To = batchChoice[batchChoice.index('>') - len(batchChoice) + 1:]
+
+    strPath = Modo_UserDataEntry_asString('Paste Your Directory Path!')
+
+    if not strPath[-2:] == '\*':
+        strPathDir = strPath + '\*'
+
+    for eachFile in glob.glob(strPathDir):
+        #get the filename
+        f = os.path.basename(eachFile)
+        fileExt = '.' + str(fileType_From.lower())
+        if str(f[-4:].lower()) == fileExt:
+            Scene_Open(eachFile)
+
+            #FINALIZE....
+            #get the file name...
+            newFileName = str(Scene_Name(0)[0]).split('.')[0]
+
+            #Save as obj file
+            if fileType_To == 'OBJ':
+                fldr_OBJ = '_OBJ'
+                objPath = strPath + '/' + fldr_OBJ
+                if not os.path.exists(objPath): os.makedirs(objPath)
+                strSaveAs = objPath + '/' + newFileName + '.obj'
+                Scene_SaveAs_OBJ(strSaveAs)
+
+            #Save as lxo file
+            if fileType_To == 'LXO':
+                fldr_LXO = '_LXO'
+                lxoPath = strPath + '/' + fldr_LXO
+                if not os.path.exists(lxoPath): os.makedirs(lxoPath)
+                strSaveAs = lxoPath + '/' + newFileName + '.lxo'
+                Scene_SaveAs_LXO(strSaveAs)
+
+            #Save as lightwave file
+            if fileType_To == 'LWO':
+                fldr_LWO = '_LWO'
+                lwoPath = strPath + '/' + fldr_LWO
+                if not os.path.exists(lwoPath): os.makedirs(lwoPath)
+                strSaveAs = lwoPath + '/' + newFileName + '.lwo'
+                Scene_SaveAs_LWO(strSaveAs)
+
+            #Save as fbx file
+            if fileType_To == 'FBX':
+                fldr_FBX = '_FBX'
+                fbxPath = strPath + '/' + fldr_FBX
+                if not os.path.exists(fbxPath): os.makedirs(fbxPath)
+                strSaveAs = fbxPath + '/' + newFileName + '.fbx'
+                Scene_SaveAs_FBX(strSaveAs)
+
+            #Save as dae collada file
+            if fileType_To == 'DAE':
+                fldr_DAE = '_DAE'
+                daePath = strPath + '/' + fldr_DAE
+                if not os.path.exists(daePath): os.makedirs(daePath)
+                strSaveAs = daePath + '/' + newFileName + '.dae'
+                Scene_SaveAs_DAE(strSaveAs)
+
+            #Save as alembic file
+            if fileType_To == 'ABC':
+                fldr_ABC = '_ABC'
+                abcPath = strPath + '/' + fldr_ABC
+                if not os.path.exists(abcPath): os.makedirs(abcPath)
+                strSaveAs = abcPath + '/' + newFileName + '.abc'
+                Scene_SaveAs_ALEMBIC(strSaveAs)
+
+            #close the scene file
+            Scene_Close()
+        #done
+
+
+####################################################
+####################################################
 #ITEM START
 
 
@@ -15085,11 +15175,26 @@ def Item_Duplicate(Requires_ItemID):
         lx.eval('!item.duplicate false locator false true')
 
 
+def Item_Duplicate_No_Hierarchy(Requires_ItemID):
+    if type(Requires_ItemID) is list:
+        TheList = Requires_ItemID
+    else:
+        TheList = str.split(Requires_ItemID, ',')
+    for EachItem in TheList:
+        lx.eval('select.Item item:{%s} mode: set' % EachItem)
+        lx.eval('!item.duplicate mods:false')
+
+
 def Item_Duplicate_fromSelected():
     toDupe = Item_ID_fromSelected_Get()
     for eachID in toDupe:
         Item_Duplicate(eachID)
-    Item_Select(toDupe)
+
+
+def Item_Duplicate_fromSelected_No_Hierarchy():
+    toDupe = Item_ID_fromSelected_Get()
+    for eachID in toDupe:
+        Item_Duplicate_No_Hierarchy(eachID)
 
 
 def Item_ID_fromSelected_Get():
@@ -15202,15 +15307,15 @@ def Item_Parent_in_Place(Requires_OneChildID, Requires_OneParentID):
     if type(Requires_OneChildID) is list:
         Child = Requires_OneChildID[0]
     else:
-        Child = str.split(Requires_OneChildID, ',')
+        Child = str.split(Requires_OneChildID, ',')[0]
 
     if type(Requires_OneParentID) is list:
         Parent = Requires_OneParentID[0]
     else:
-        Parent = str.split(Requires_OneParentID, ',')
-    lx.eval('select.Item item:{%s} mode: add' % Child[0])
-    lx.eval('select.subItem item:{%s} mode:add' % Parent[0])
-    lx.eval('item.parent inPlace:1')
+        Parent = str.split(Requires_OneParentID, ',')[0]
+    lx.eval('select.Item item:{%s} mode: add' % Child)
+    lx.eval('select.subItem item:{%s} mode:add' % Parent)
+    lx.eval('item.parent {%s} {%s} inPlace:1' % (Child, Parent))
 
 
 def Item_ChildrenID_Get(Requires_ParentItemID):
@@ -16983,12 +17088,102 @@ def Material_Rename_Set(RequiresMaterialName, RequiresNewMaterialName):
     lx.eval('poly.renameMaterial {%s} {%s}' % (RequiresMaterialName, RequiresNewMaterialName))
 
 
+def Poly_Set_Material(MaterialName, Rcolor_Value, Gcolor_Value, Bcolor_Value, DiffuseValue, SpecularValue, Smoothing=1, Default=0, Library=0):
+    lx.eval('!poly.setMaterial {%s} {%s %s %s} %s %s %s %s %s' % ( MaterialName, Rcolor_Value, Gcolor_Value, Bcolor_Value, DiffuseValue, SpecularValue, Smoothing, Default, Library))
+
+
 ####################################################
 ####################################################
 
 def Mesh_Cleanup(RFV, ROPP, RTPP, FDPiP, RCV, FFNV, MV, MDV, UP, FU):
     strMC = '!mesh.cleanup ' + str(RFV) + ' ' + str(ROPP) + ' ' + str(RTPP) + ' ' + str(FDPiP) + ' ' + str(RCV) + ' ' + str(FFNV) + ' ' + str(MV) + ' ' + str(MDV) + ' ' + str(UP) + ' ' + str(FU)
     lx.eval(strMC)
+
+
+####################################################
+####################################################
+
+def Radians_To_Degrees(radians):
+    pi = math.pi
+    degrees = 180 * radians / pi
+    return degrees
+
+
+def Degrees_To_Radians(degrees):
+    pi = math.pi
+    radians = pi * degrees / 180
+    return radians
+
+
+####################################################
+####################################################
+
+def Transform_Freeze_Position():
+    lx.eval('transform.freeze translation')
+
+
+def Transform_Freeze_Rotation():
+    lx.eval('transform.freeze rotation')
+
+
+def Transform_Freeze_Scale():
+    lx.eval('transform.freeze scale')
+
+
+def Transform_Freeze_Shear():
+    lx.eval('transform.freeze shear')
+
+
+def Transform_Freeze_All():
+    lx.eval('transform.freeze all')
+
+
+def Transform_Reset_Position():
+    lx.eval('transform.reset translation')
+
+
+def Transform_Reset_Rotation():
+    lx.eval('transform.reset rotation')
+
+
+def Transform_Reset_Scale():
+    lx.eval('transform.reset scale')
+
+
+def Transform_Reset_Shear():
+    lx.eval('transform.reset shear')
+
+
+def Transform_Reset_All():
+    lx.eval('transform.reset all')
+
+
+def Transform_Zero_Position():
+    lx.eval('transform.zero translation')
+
+
+def Transform_Zero_Rotation():
+    lx.eval('transform.zero rotation')
+
+
+def Transform_Zero_Scale():
+    lx.eval('transform.zero scale')
+
+
+def Transform_Zero_All():
+    lx.eval('transform.zero all')
+
+
+def Transform_Add_Position():
+    lx.eval('transform.add pos')
+
+
+def Transform_Add_Rotation():
+    lx.eval('transform.add rot')
+
+
+def Transform_Add_Scale():
+    lx.eval('transform.add scl')
 
 
 ####################################################
@@ -17084,14 +17279,10 @@ def __fn_pyModo_Vert_Average_Position_Get(Requires_ItemID, Enter_X_Y_Z_or_ALL):
     if not VertList: VertList = Vert_Index_All(Requires_ItemID)
 
     for EachVert in VertList:
-        xVertPos = lx.eval('query layerservice vert.wpos ? {%s}' % EachVert)[0]
-        xVerts.append(xVertPos)
-
-        yVertPos = lx.eval('query layerservice vert.wpos ? {%s}' % EachVert)[1]
-        yVerts.append(yVertPos)
-
-        zVertPos = lx.eval('query layerservice vert.wpos ? {%s}' % EachVert)[2]
-        zVerts.append(zVertPos)
+        allVerts = lx.eval('query layerservice vert.wpos ? {%s}' % EachVert)
+        xVerts.append(allVerts[0])
+        yVerts.append(allVerts[1])
+        zVerts.append(allVerts[2])
 
     AveXVertPos = sum(xVerts) / len(xVerts)
     AveYVertPos = sum(yVerts) / len(yVerts)
@@ -17155,6 +17346,110 @@ def SelectionSet_Delete(RequiresName):
 
 def __fn_pyModo_Check_if_String(RequiresName):
     return isinstance(RequiresName, str)
+
+
+def Vert_Select_UnderMouse():
+    Vert_Mode_Set()
+    lx.eval('!!select.3DElementUnderMouse set')
+
+
+def Edge_Select_UnderMouse():
+    Edge_Mode_Set()
+    lx.eval('!!select.3DElementUnderMouse set')
+
+
+def Poly_Select_UnderMouse():
+    Poly_Mode_Set()
+    lx.eval('!!select.3DElementUnderMouse set')
+
+
+def SelectionSet_UnderMouse():
+    PolySS = []
+    EdgeSS = []
+    VertSS = []
+
+    m_ID = Mesh_ID_Selected()
+
+    if not m_ID:
+        Modo_UserMessage_Info('Mesh Selection', 'A selected mesh item is required!!')
+        sys.exit()
+
+    if len(m_ID) > 1:
+        Modo_UserMessage_Info('Mesh Selection', 'Please select one mesh layer only!!')
+        sys.exit()
+
+    mComp = Modo_Component_Mode_Get()
+
+    if mComp == 'polygon':
+        PolySS = Poly_SelectionSetNames_Get(m_ID)
+        Poly_Select_UnderMouse()
+        if Poly_Count_Selected(m_ID) < 1:
+            Modo_UserMessage_Info('Polygon Detection', 'Unable to detect a polygon under the mouse!!')
+            sys.exit()
+
+        Comp_ID = Poly_Index_Selected(m_ID)
+
+        SelSets = []
+
+        for eachSS in PolySS:
+            Poly_DeSelect_All()
+            SelectionSet_Select(eachSS)
+
+            for eachPoly in Poly_Index_Selected(m_ID):
+                if Comp_ID[0] == eachPoly:
+                    SelSets.append(eachSS)
+                    break
+
+        Poly_DeSelect_All()
+        for ss in SelSets:
+            SelectionSet_Select(ss)
+
+    if mComp == 'edge':
+        EdgeSS = Edge_SelectionSetNames_Get(m_ID)
+        Edge_Select_UnderMouse()
+        if Edge_Count_Selected(m_ID) < 1:
+            Modo_UserMessage_Info('Edge Detection', 'Unable to detect an edge under the mouse!!')
+            sys.exit()
+
+        Comp_ID = Edge_Index_Selected(m_ID)
+
+        SelSets = []
+
+        for eachSS in EdgeSS:
+            Edge_DeSelect_All()
+            SelectionSet_Select(eachSS)
+
+            for eachEdge in Edge_Index_Selected(m_ID):
+                if Comp_ID[0] == eachEdge:
+                    SelSets.append(eachSS)
+                    break
+
+        Edge_DeSelect_All()
+        for ss in SelSets:
+            SelectionSet_Select(ss)
+
+    if mComp == 'vertex':
+        VertSS = Vert_SelectionSetNames_Get(m_ID)
+        Vert_Select_UnderMouse()
+        if Vert_Count_Selected(m_ID) < 1:
+            Modo_UserMessage_Info('Vertex Detection', 'Unable to detect a vertex under the mouse!!')
+            sys.exit()
+
+        Comp_ID = Vert_Index_Selected(m_ID)
+
+        SelSets = []
+
+        for eachSS in VertSS:
+            Vert_DeSelect_All()
+            SelectionSet_Select(eachSS)
+            for eachVert in Vert_Index_Selected(m_ID):
+                if Comp_ID[0] == eachVert:
+                    SelSets.append(eachSS)
+                    break
+
+        Vert_DeSelect_All()
+        for ss in SelSets:
+            SelectionSet_Select(ss)
 
 
 ####################################################
@@ -17714,25 +18009,36 @@ def __pyModo_VMAPS(Requires_ItemID, strVMapQuery, *VMAP):
 
         Item_Select(EachItem)
 
-        if VMAP:
-            All_Vmaps = lx.evalN('query layerservice vmaps ? %s' % VMAP[0])
-        else:
-            All_Vmaps = lx.evalN('query layerservice vmaps ? all')
+        All_Vmaps = lx.evalN('query layerservice vmaps ? all')
 
-    for eachVM in All_Vmaps:
-        VmapType = lx.eval('query layerservice vmap.type ? {%s}' % eachVM)
-        VmapName = lx.eval('query layerservice vmap.name ? {%s}' % eachVM)
-        VmapIndex = lx.eval('query layerservice vmap.index ?')
+        for eachVM in All_Vmaps:
+            VmapType = lx.eval('query layerservice vmap.type ? {%s}' % eachVM)
 
-        if strVMapQuery == 'type':
-            if VmapType not in VMap_List:
-                VMap_List.append(VmapType)
-        if strVMapQuery == 'name':
-            if VmapName not in VMap_List:
-                VMap_List.append(VmapName)
-        if strVMapQuery == 'index':
-            if VmapIndex not in VMap_List:
-                VMap_List.append(VmapIndex)
+            if VMAP:
+                if VmapType == VMAP[0]:
+                    VmapName = lx.eval('query layerservice vmap.name ? {%s}' % eachVM)
+                    VmapIndex = lx.eval('query layerservice vmap.index ?')
+
+                    if strVMapQuery == 'type':
+                        if VmapType not in VMap_List:
+                            VMap_List.append(VmapType)
+                    if strVMapQuery == 'name':
+                        if VmapName not in VMap_List:
+                            VMap_List.append(VmapName)
+                    if strVMapQuery == 'index':
+                        if VmapIndex not in VMap_List:
+                            VMap_List.append(VmapIndex)
+
+            else:
+                if strVMapQuery == 'type':
+                    if VmapType not in VMap_List:
+                        VMap_List.append(VmapType)
+                if strVMapQuery == 'name':
+                    if VmapName not in VMap_List:
+                        VMap_List.append(VmapName)
+                if strVMapQuery == 'index':
+                    if VmapIndex not in VMap_List:
+                        VMap_List.append(VmapIndex)
 
     return VMap_List
 
@@ -18027,7 +18333,7 @@ def Key_Delete_All_Item_Transform_Keys(Requires_ItemID):
         for p in Pos_ID:
             Transform_ID.append(p)
 
-        Rot_ID = Item_Rotate_ID_Get(EachItem)
+        Rot_ID = Item_Rotation_ID_Get(EachItem)
         for r in Rot_ID:
             Transform_ID.append(r)
 
@@ -18113,7 +18419,7 @@ def Key_Frames_Get(Requires_OneItemID):
         for p in Pos_ID:
             Transform_ID.append(p)
 
-        Rot_ID = Item_Rotate_ID_Get(EachItem)
+        Rot_ID = Item_Rotation_ID_Get(EachItem)
         for r in Rot_ID:
             Transform_ID.append(r)
 
@@ -18525,6 +18831,7 @@ def PolyShapeMaker(PolySize, VertCount, SetSpikey=False):
         mt.Spikey_pOnOff(1)
         mt.Tool_Apply_Set()
         mt.Spikey_pOnOff(0)
+    lx.eval('select.item {PolyShapeMaker} set')
 
 
 ####################################################
@@ -18627,14 +18934,6 @@ def Group_Mask_PolyTag_Get(Requires_ItemID):
 ####################################################
 ####################################################
 
-def WorkPlane_FitSelect():
-    lx.eval('workPlane.fitSelect')
-
-
-def WorkPlane_Reset():
-    lx.eval('workPlane.Reset')
-
-
 def Vert_X_Position_Set(xValue):
     lx.eval('vert.set x %s' % xValue)
 
@@ -18677,6 +18976,113 @@ def Replicator_PointSource(RequiresReplicatorID, RequiresPointSourceID):
 
 def Poly_Normal_Get(RequiresOnePolyIndex):
     return lx.eval('query layerservice poly.normal ? {%s}' % RequiresOnePolyIndex)
+
+
+def Poly_Flip():
+    lx.eval('poly.flip')
+
+
+def Item_Display_Draw_Set():
+    lx.eval('item.draw add locator')
+
+
+def Item_Display_Help_Label_Set(RequiresLabelText):
+    lx.eval('item.help add label {%s}' % RequiresLabelText)
+
+
+def Render_Root_Select():
+    lx.eval('select.Item polyRender006 set')
+
+
+####################################################
+####################################################
+
+def WorkPlane_FitSelect():
+    lx.eval('workPlane.fitSelect')
+
+
+def WorkPlane_Reset():
+    lx.eval('workPlane.Reset')
+
+
+def WorkPlane_Edit_Rotation_X_Get():
+    return lx.eval('workPlane.edit rotX:?')
+
+
+def WorkPlane_Edit_Rotation_Y_Get():
+    return lx.eval('workPlane.edit rotY:?')
+
+
+def WorkPlane_Edit_Rotation_Z_Get():
+    return lx.eval('workPlane.edit rotZ:?')
+
+
+def WorkPlane_Edit_Center_X_Get():
+    return lx.eval('workPlane.edit cenX:?')
+
+
+def WorkPlane_Edit_Center_Y_Get():
+    return lx.eval('workPlane.edit cenY:?')
+
+
+def WorkPlane_Edit_Center_Z_Get():
+    return lx.eval('workPlane.edit cenZ:?')
+
+
+def WorkPlane_Edit_Rotation_X_Set(EnterValueHere):
+    lx.eval('workPlane.edit rotX: %s' % EnterValueHere)
+
+
+def WorkPlane_Edit_Rotation_Y_Set(EnterValueHere):
+    lx.eval('workPlane.edit rotY: %s' % EnterValueHere)
+
+
+def WorkPlane_Edit_Rotation_Z_Set(EnterValueHere):
+    lx.eval('workPlane.edit rotZ: %s' % EnterValueHere)
+
+
+def WorkPlane_Edit_Center_X_Set(EnterValueHere):
+    lx.eval('workPlane.edit cenX: %s' % EnterValueHere)
+
+
+def WorkPlane_Edit_Center_Y_Set(EnterValueHere):
+    lx.eval('workPlane.edit cenY: %s' % EnterValueHere)
+
+
+def WorkPlane_Edit_Center_Z_Set(EnterValueHere):
+    lx.eval('workPlane.edit cenZ: %s' % EnterValueHere)
+
+
+def WorkPlane_Offset_X_Set(EnterValueHere):
+    lx.eval('workPlane.offset 0 %s' % EnterValueHere)
+
+
+def WorkPlane_Offset_Y_Set(EnterValueHere):
+    lx.eval('workPlane.offset 1 %s' % EnterValueHere)
+
+
+def WorkPlane_Offset_Z_Set(EnterValueHere):
+    lx.eval('workPlane.offset 2 %s' % EnterValueHere)
+
+
+def WorkPlane_Rotation_X_Set(EnterValueHere):
+    lx.eval('workPlane.rotate 0 %s' % EnterValueHere)
+
+
+def WorkPlane_Rotation_Y_Set(EnterValueHere):
+    lx.eval('workPlane.rotate 1 %s' % EnterValueHere)
+
+
+def WorkPlane_Rotation_Z_Set(EnterValueHere):
+    lx.eval('workPlane.rotate 2 %s' % EnterValueHere)
+
+
+def Center_Item_Match_WorkPlane_Rotation():
+    lx.eval('center.matchWorkplaneRot')
+
+
+def Center_Item_Match_WorkPlane_Position():
+    lx.eval('center.matchWorkplanePos')
 
 
 ####################################################
@@ -18819,7 +19225,7 @@ def Item_Scale_Value_Get(Requires_ItemID, Enter_X_Y_or_Z):
             return lx.eval('transform.channel scl.Z ?')
 
 
-def Item_Rotate_Value_Get(Requires_ItemID, Enter_X_Y_or_Z):
+def Item_Rotation_Value_Get(Requires_ItemID, Enter_X_Y_or_Z):
     if not __fn_pyModo_Check_if_String(Enter_X_Y_or_Z): Enter_X_Y_or_Z = str(Enter_X_Y_or_Z)
     AXIS = Enter_X_Y_or_Z.upper()
 
@@ -18878,7 +19284,7 @@ def __pyModo_Item_Constrain(Requires_FromItemID, Requires_ToItemID, ConsType):
     lx.eval('select.Item item:{%s} mode: add' % Requires_FromItemID)
     lx.eval('select.subItem item:{%s} mode:add' % Requires_ToItemID)
 
-    if ConsType == '':
+    if ConsType == 'Direction':
         lx.eval('constraintDirection')
 
     if ConsType == 'Position':
@@ -19183,7 +19589,7 @@ def Item_Scale_Set(Requires_ItemID, SclX, SclY, SclZ):
         lx.eval('transform.channel scl.Z {%s}' % SclZ)
 
 
-def Item_Rotate_Set(Requires_ItemID, RotX, RotY, RotZ):
+def Item_Rotation_Set(Requires_ItemID, RotX, RotY, RotZ):
     if type(Requires_ItemID) is list:
         TheList = Requires_ItemID
     else:
@@ -19291,7 +19697,7 @@ def Item_Scale_ID_Get(Requires_ItemID):
     return Scale_ID_List
 
 
-def Item_Rotate_ID_Get(Requires_ItemID):
+def Item_Rotation_ID_Get(Requires_ItemID):
     Rotate_ID_List = []
     if type(Requires_ItemID) is list:
         TheList = Requires_ItemID
@@ -19324,7 +19730,7 @@ def Item_Add_Scale_Channel(Requires_ItemID):
         lx.eval('transform.add scl {%s} adv:1' % EachItem)
 
 
-def Item_Add_Rotate_Channel(Requires_ItemID):
+def Item_Add_Rotation_Channel(Requires_ItemID):
     if type(Requires_ItemID) is list:
         TheList = Requires_ItemID
     else:
