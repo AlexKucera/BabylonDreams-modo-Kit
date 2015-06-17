@@ -34,3 +34,8 @@
 .DS_Store*
 ehthumbs.db
 Thumbs.db
+
+# Exceptions #
+##############
+
+!mLight.pyc
