@@ -17,7 +17,7 @@ import traceback
 
 csv_path = "/Users/alex/Downloads/15-06-14/hygdata_v3.csv"
 csv_format = ","
-distance_type = ""  # "_med"
+distance_type = "_med"
 
 # Different particle sets based on absolute magnitude
 csv_particles_m4 = "/Users/alex/Downloads/15-06-14/hygdata_v3_particles_m4" + \
@@ -63,7 +63,7 @@ def main():
         count = 0
         for row in csvreader:
 
-            if row[6] == "proper":
+            if row[6] == "proper" or row[6] == "Sol":
                 pass
             elif float(row[14]) < 4.01:
                 count += 1
@@ -83,7 +83,7 @@ def main():
         count = 0
         for row in csvreader:
 
-            if row[6] == "proper":
+            if row[6] == "proper" or row[6] == "Sol":
                 pass
             elif 6.01 > float(row[14]) > 4.01:
                 count += 1
@@ -103,7 +103,7 @@ def main():
         count = 0
         for row in csvreader:
 
-            if row[6] == "proper":
+            if row[6] == "proper" or row[6] == "Sol":
                 pass
             elif 8.01 > float(row[14]) > 6.01:
                 count += 1
@@ -123,7 +123,7 @@ def main():
         count = 0
         for row in csvreader:
 
-            if row[6] == "proper":
+            if row[6] == "proper" or row[6] == "Sol":
                 pass
             elif float(row[14]) > 8.01:
                 count += 1
