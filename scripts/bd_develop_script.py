@@ -21,7 +21,7 @@ V0.1 Initial Release - 2015-05-19
 
 import traceback
 import lx
-import bd_headless_render  # Import the script here
+import bd_universe_creator  # Import the script here
 
 
 # FUNCTIONS -----------------------------------------------
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         argsAsString = lx.arg()
         argsAsTuple = lx.args()
 
-        bd_headless_render.main()  # call the script with any arguments here.
+        bd_universe_creator.main()  # call the script with any arguments here.
 
     except:
         lx.out(traceback.format_exc())
