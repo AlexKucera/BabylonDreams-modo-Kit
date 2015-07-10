@@ -19,7 +19,7 @@ import lx
 import csv
 import pyModo
 
-csv_path = "/Users/alex/Downloads/15-06-14/hygdata_v3_debug.csv"
+csv_path = "/Users/alex/Downloads/15-06-14/hygdata_v3.csv"
 csv_format = ","
 
 
@@ -161,11 +161,8 @@ def magnitude_key(particle_id, magnitude, gradient_id, floor=20.0, ceiling=-20.0
     """
     floor = 1 / pow(2.512, float(floor))
     ceiling = 1 / pow(2.512, float(ceiling))
-
     brightness = 1 / pow(2.512, float(magnitude))
-
-    brightness = (float(brightness) - floor) / (ceiling - floor) * 4000000000
-
+    brightness = (float(brightness) - floor) / (ceiling - floor) * 40000000000
     lx.eval("channel.key " + str(float(particle_id)) + " " + str(float(brightness))
             + " insert:true channel:{" + gradient_id + ":value}")
 
@@ -211,7 +208,7 @@ def star_grads(mag_id, col_id, lower, upper):
 
 
 # noinspection PyArgumentList
-def new_blob(name, csv_id, size=0.01, input_type="particleID"):
+def new_blob(name, csv_id, size=0.01, rand_size=0.0001, input_type="particleID"):
     """
     Creates a new Blob with a preset Input type and Shader Effect.
     :param name: What to call the Blob after its creation.
@@ -219,14 +216,15 @@ def new_blob(name, csv_id, size=0.01, input_type="particleID"):
     :return: list
     """
     pyModo.Blob_Add_New()
-    blob_id = pyModo.Blob_ID_Selected()
+    blob_id = pyModo.Blob_ID_Selected()[0]
     lx.eval("item.name %s blob" % name)
     lx.eval("volume.sizeInput %s" % input_type)
     lx.eval("volume.particle %s" % csv_id)
     lx.eval("item.channel blob$glDisplay false")
     lx.eval("item.channel blob$radius %s" % size)
+    lx.eval("item.channel blob$sizeRand %s" % rand_size)
 
-    return blob_id[0]
+    return blob_id
 
 # noinspection PyArgumentList
 def new_csv_cache(name, path, size=1.0):
@@ -236,12 +234,12 @@ def new_csv_cache(name, path, size=1.0):
     :return: list
     """
     pyModo.CSV_Point_Cache_Add_New()
-    csv_id = pyModo.CSV_Point_Cache_ID_Selected()
+    csv_id = pyModo.CSV_Point_Cache_ID_Selected()[0]
     lx.eval("item.name %s csvCache" % name)
     lx.eval("item.channel csvCache$seqType still")
     lx.eval("item.channel csvCache$glSize %s" % size)
     lx.eval("item.channel csvCache$filePattern %s" % path)
-    return csv_id[0]
+    return csv_id
 
 
 def new_group(name, parent, position):
@@ -249,6 +247,17 @@ def new_group(name, parent, position):
     group_id = pyModo.Group_ID_Selected()[0]
     lx.eval("item.name %s mask" % name)
     lx.eval("texture.parent %s %s" % (parent, position))
+
+    return group_id
+
+def new_blob_group(blob_name):
+    lx.eval("select.Item Stars")
+    pyModo.Group_Add_New()
+    group_id = pyModo.Group_ID_Selected()[0]
+    lx.eval("mask.setMesh %s" % blob_name)
+    lx.eval("shader.create advancedMaterial")
+    lx.eval("item.channel advancedMaterial$diffAmt 0.0")
+    lx.eval("item.channel advancedMaterial$specAmt 0.0")
 
     return group_id
 
@@ -285,149 +294,62 @@ def main():
 
     main_group = False
 
-    for mesh in meshes:
+    csv_m4_id = new_csv_cache("m4_stars_csv_cache", cache_m4_path, 1.0)
+    csv_m6_id = new_csv_cache("m6_stars_csv_cache", cache_m6_path, 0.75)
+    csv_m8_id = new_csv_cache("m8_stars_csv_cache", cache_m8_path, 0.5)
+    csv_m10_id = new_csv_cache("m10_stars_csv_cache", cache_m10_path, 0.25)
 
-        if mesh == "Stars":
-            main_group = True
-            lx.eval("select.Item Stars")
-            main_group_id = pyModo.Group_ID_Selected()[0]
+    blob_m4_id = new_blob("m4_stars_blobs", csv_m4_id, 20.0, 0.0)
+    blob_m6_id = new_blob("m6_stars_blobs", csv_m6_id, 10.0)
+    blob_m8_id = new_blob("m8_stars_blobs", csv_m8_id, 6.0)
+    blob_m10_id = new_blob("m10_stars_blobs", csv_m10_id, 5.0)
 
-        elif mesh == "Star_Magnitude_M4":
-            mag_m4 = True
-            lx.eval("select.Item Star_Magnitude_M4")
-            mag_m4_id = pyModo.Gradient_ID_Selected()[0]
+    main_group_id = new_group("Stars", "Render", 2)
+    lx.eval("shader.create defaultShader")
+    lx.eval("item.channel indType none")
+    lx.eval("item.channel shadCast false")
+    lx.eval("item.channel shadRecv false")
+    lx.eval("item.channel visInd false")
+    lx.eval("item.channel visOccl false")
 
-        elif mesh == "Star_Magnitude_M6":
-            mag_m6 = True
-            lx.eval("select.Item Star_Magnitude_M6")
-            mag_m6_id = pyModo.Gradient_ID_Selected()[0]
+    group_m4_id = new_blob_group("m4_stars_blobs")
+    mag_m4_id = new_gradient("Star_Magnitude_M4", "lumiAmount")
+    lx.eval("shader.create constant")
+    lx.eval("shader.setEffect lumiAmount")
+    lx.eval("texture.name M4_Multiplier")
+    lx.eval("item.channel textureLayer$blend multiply")
+    col_m4_id = new_gradient("Star_Color_M4", "lumiColor")
 
-        elif mesh == "Star_Magnitude_M8":
-            mag_m8 = True
-            lx.eval("select.Item Star_Magnitude_M8")
-            mag_m8_id = pyModo.Gradient_ID_Selected()[0]
+    group_m6_id = new_blob_group("m6_stars_blobs")
+    mag_m6_id = new_gradient("Star_Magnitude_M6", "lumiAmount")
+    lx.eval("shader.create constant")
+    lx.eval("shader.setEffect lumiAmount")
+    lx.eval("texture.name M6_Multiplier")
+    lx.eval("item.channel textureLayer$blend multiply")
+    lx.eval("item.channel constant$value 0.5")
+    col_m6_id = new_gradient("Star_Color_M6", "lumiColor")
 
-        elif mesh == "Star_Magnitude_M10":
-            mag_m10 = True
-            lx.eval("select.Item Star_Magnitude_M10")
-            mag_m10_id = pyModo.Gradient_ID_Selected()[0]
+    group_m8_id = new_blob_group("m8_stars_blobs")
+    mag_m8_id = new_gradient("Star_Magnitude_M8", "lumiAmount")
+    lx.eval("shader.create constant")
+    lx.eval("shader.setEffect lumiAmount")
+    lx.eval("texture.name M8_Multiplier")
+    lx.eval("item.channel textureLayer$blend multiply")
+    lx.eval("item.channel constant$value 20.0")
+    col_m8_id = new_gradient("Star_Color_M8", "lumiColor")
 
-        elif mesh == "Star_Color_M4":
-            col_m4 = True
-            lx.eval("select.Item Star_Color_M4")
-            col_m4_id = pyModo.Gradient_ID_Selected()[0]
+    group_m10_id = new_blob_group("m10_stars_blobs")
+    mag_m10_id = new_gradient("Star_Magnitude_M10", "lumiAmount")
+    lx.eval("shader.create constant")
+    lx.eval("shader.setEffect lumiAmount")
+    lx.eval("texture.name M10_Multiplier")
+    lx.eval("item.channel textureLayer$blend multiply")
+    lx.eval("item.channel constant$value 2000.0")
+    col_m10_id = new_gradient("Star_Color_M10", "lumiColor")
 
-        elif mesh == "Star_Color_M6":
-            col_m6 = True
-            lx.eval("select.Item Star_Color_M6")
-            col_m6_id = pyModo.Gradient_ID_Selected()[0]
-
-        elif mesh == "Star_Color_M8":
-            col_m8 = True
-            lx.eval("select.Item Star_Color_M8")
-            col_m8_id = pyModo.Gradient_ID_Selected()[0]
-
-        elif mesh == "Star_Color_M10":
-            col_m10 = True
-            lx.eval("select.Item Star_Color_M10")
-            col_m10_id = pyModo.Gradient_ID_Selected()[0]
-
-        elif mesh == "m4_stars_csv_cache":
-            csv_m4 = True
-            lx.eval("select.Item m4_stars_csv_cache")
-            csv_m4_id = pyModo.CSV_Point_Cache_ID_Selected()[0]
-
-        elif mesh == "m6_stars_csv_cache":
-            csv_m6 = True
-            lx.eval("select.Item m6_stars_csv_cache")
-            csv_m6_id = pyModo.CSV_Point_Cache_ID_Selected()[0]
-
-        elif mesh == "m8_stars_csv_cache":
-            csv_m8 = True
-            lx.eval("select.Item m8_stars_csv_cache")
-            csv_m8_id = pyModo.CSV_Point_Cache_ID_Selected()[0]
-
-        elif mesh == "m10_stars_csv_cache":
-            csv_m10 = True
-            lx.eval("select.Item m10_stars_csv_cache")
-            csv_m10_id = pyModo.CSV_Point_Cache_ID_Selected()[0]
-
-        elif mesh == "m4_stars_blobs":
-            blob_m4 = True
-            lx.eval("select.Item m4_stars_blobs")
-            blob_m4_id = pyModo.Blob_ID_Selected()[0]
-
-        elif mesh == "m6_stars_blobs":
-            blob_m6 = True
-            lx.eval("select.Item m6_stars_blobs")
-            blob_m6_id = pyModo.Blob_ID_Selected()[0]
-
-        elif mesh == "m8_stars_blobs":
-            blob_m8 = True
-            lx.eval("select.Item m8_stars_blobs")
-            blob_m8_id = pyModo.Blob_ID_Selected()[0]
-
-        elif mesh == "m10_stars_blobs":
-            blob_m10 = True
-            lx.eval("select.Item m10_stars_blobs")
-            blob_m10_id = pyModo.Blob_ID_Selected()[0]
-
-    if not main_group:
-        main_group_id = new_group("Stars", "Render", 2)
-        lx.eval("shader.create defaultShader")
-        lx.eval("item.channel indType none")
-        lx.eval("item.channel shadCast false")
-        lx.eval("item.channel shadRecv false")
-        lx.eval("item.channel visInd false")
-        lx.eval("item.channel visOccl false")
-
-    if not mag_m4:
-        mag_m4_id = new_gradient("Star_Magnitude_M4", "lumiAmount")
-
-    if not mag_m6:
-        mag_m6_id = new_gradient("Star_Magnitude_M6", "lumiAmount")
-
-    if not mag_m8:
-        mag_m8_id = new_gradient("Star_Magnitude_M8", "lumiAmount")
-
-    if not mag_m10:
-        mag_m10_id = new_gradient("Star_Magnitude_M10", "lumiAmount")
-
-    if not col_m4:
-        col_m4_id = new_gradient("Star_Color_M4", "lumiColor")
-
-    if not col_m6:
-        col_m6_id = new_gradient("Star_Color_M6", "lumiColor")
-
-    if not col_m8:
-        col_m8_id = new_gradient("Star_Color_M8", "lumiColor")
-
-    if not col_m10:
-        col_m10_id = new_gradient("Star_Color_M10", "lumiColor")
-
-    if not csv_m4:
-        csv_m4_id = new_csv_cache("m4_stars_csv_cache", cache_m4_path, 1.0)
-
-    if not csv_m6:
-        csv_m6_id = new_csv_cache("m6_stars_csv_cache", cache_m6_path, 0.75)
-
-    if not csv_m8:
-        csv_m8_id = new_csv_cache("m8_stars_csv_cache", cache_m8_path, 0.5)
-
-    if not csv_m10:
-        csv_m10_id = new_csv_cache("m10_stars_csv_cache", cache_m10_path, 0.25)
-
-    if not blob_m4:
-        blob_m4_id = new_blob("m4_stars_blobs", csv_m4_id, 20.0)
-
-    if not blob_m6:
-        blob_m6_id = new_blob("m6_stars_blobs", csv_m6_id, 10.0)
-
-    if not blob_m8:
-        blob_m8_id = new_blob("m8_stars_blobs", csv_m8_id, 6.0)
-
-    if not blob_m10:
-        blob_m10_id = new_blob("m10_stars_blobs", csv_m10_id, 5.0)
+    lx.eval("select.Item envMaterial010")
+    lx.eval("item.channel envMaterial$type constant")
+    lx.eval("item.channel envMaterial$zenColor {0.0 0.0 0.0}")
 
     lines = file_len(csv_path) - 1
     print(str(lines) + " lines in this file.")

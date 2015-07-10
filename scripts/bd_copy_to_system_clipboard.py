@@ -8,20 +8,13 @@
 
 Release Notes:
 
-A simple wrapper that allows me to bind one button in the modo UI to.
-With this setup I don't have to build a UI for a script I am still developing or playing
-around with.
-
-Simply import the script that is being currently developed and call it at the very
-bottom (line 49)
-
-V0.1 Initial Release - 2015-05-19
+V0.1 Initial Release
 
 """
 
 import traceback
 import lx
-import bd_copy_to_system_clipboard  # Import the script here
+import pyperclip
 
 
 # FUNCTIONS -----------------------------------------------
@@ -30,7 +23,9 @@ import bd_copy_to_system_clipboard  # Import the script here
 
 # MAIN PROGRAM --------------------------------------------
 def main():
-    pass
+    keys = lx.eval("key.copy")
+    pyperclip.copy(keys)
+    # paste = pyperclip.paste()
 
 # END MAIN PROGRAM -----------------------------------------------
 
@@ -46,7 +41,7 @@ if __name__ == '__main__':
         argsAsString = lx.arg()
         argsAsTuple = lx.args()
 
-        bd_copy_to_system_clipboard.main()  # call the script with any arguments here.
+        main()
 
     except:
         lx.out(traceback.format_exc())
