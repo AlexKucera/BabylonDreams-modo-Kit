@@ -78,8 +78,9 @@ def main():
 
                 lx.eval("select.Item \"%s\"" % x)
                 filepath = lx.eval("item.channel renderOutput$filename ?")
+                enabled = lx.eval("shader.setVisible \"%s\" ?" % x)
 
-                if filepath is not None:
+                if filepath is not None and enabled:
 
                     fileformat = lx.eval("item.channel renderOutput$format ?")
 
@@ -99,6 +100,11 @@ def main():
                     lx.eval("item.channel renderOutput$filename " + renderoutputpath)
                     lx.out("Setting Render Output format to: " + fileformat)
                     lx.eval("item.channel renderOutput$format " + fileformat)
+
+                else:
+                    
+                    lx.out("Skipping %s as it is either disabled or has no \"PATH\" "
+                           "filled in" % x)
 
         bd_outputPattern.main()
 
