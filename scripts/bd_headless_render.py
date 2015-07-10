@@ -73,7 +73,9 @@ def main():
         wd_regex = re.compile("/Volumes/ProjectsRaid/WorkingProjects/[^/]*/[^/]*/")
         workingdirectory = wd_regex.match(filepath).group()
 
-        batchfile = workingdirectory + "tmp/" + filename + \
+        batchdir = workingdirectory + "work/modo/05_render/_batching/"
+        bd_utils.makes_path(batchdir)
+        batchfile = batchdir + filename + \
                     "_batchrender_frames_" + first_frame + "-" + last_frame \
                     +".txt"
         lx.out("Saving renderbatch at: " + batchfile)
