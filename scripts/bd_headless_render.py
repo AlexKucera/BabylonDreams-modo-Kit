@@ -73,7 +73,7 @@ def main():
         wd_regex = re.compile("/Volumes/ProjectsRaid/WorkingProjects/[^/]*/[^/]*/")
         workingdirectory = wd_regex.match(filepath).group()
 
-        batchdir = workingdirectory + "work/modo/05_render/_batching/"
+        batchdir = workingdirectory + "work/modo/05_render/_batch/"
         bd_utils.makes_path(batchdir)
         batchfile = batchdir + filename + \
                     "_batchrender_frames_" + first_frame + "-" + last_frame \
