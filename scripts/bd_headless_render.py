@@ -16,6 +16,7 @@ window and copy the required command into the systems clipboard.
 V0.1 Initial Release - 2015-05-19
 
 """
+from itertools import izip_longest
 import os
 import re
 import subprocess
@@ -27,13 +28,20 @@ import pyperclip
 
 # FUNCTIONS -----------------------------------------------
 
+def grouper(iterable, n, fillvalue=''):
+    args = [iter(iterable)] * n
+    return izip_longest(*args, fillvalue=fillvalue)
+
+def chunker(seq, size):
+    return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
+
 # END FUNCTIONS -----------------------------------------------
 
 # MAIN PROGRAM --------------------------------------------
 import pyModo
 
 
-def main():
+def main(batchsize=None):
     lx.out("Headless Rendering Triggered")
 
     headless_path = lx.eval("query platformservice path.path ? headless") + "_cl"
@@ -73,14 +81,31 @@ def main():
         wd_regex = re.compile("/Volumes/ProjectsRaid/WorkingProjects/[^/]*/[^/]*/")
         workingdirectory = wd_regex.match(filepath).group()
 
-        batchdir = workingdirectory + "work/modo/05_render/_batching/"
+        batchdir = workingdirectory + "work/modo/05_render/_batch/"
         bd_utils.makes_path(batchdir)
-        batchfile = batchdir + filename + \
-                    "_batchrender_frames_" + first_frame + "-" + last_frame \
-                    +".txt"
-        lx.out("Saving renderbatch at: " + batchfile)
 
-        template = """log.toConsole true
+        if batchsize:
+
+            shellfile = batchdir + filename + "_batchrender.sh"
+            s = open(shellfile, 'w')
+            s.write("#!/usr/bin/env bash\n\n")
+
+            filesdir = workingdirectory + "work/modo/05_render/_batch/" + filename + "/"
+            bd_utils.makes_path(filesdir)
+
+            framelist = range(int(first_frame), int(last_frame) + 1, int(frame_step))
+            framelist = chunker(framelist, batchsize)
+
+            for framegroup in framelist:
+                first_frame = str(min(int(minframe) for minframe in framegroup))
+                last_frame = str(max(int(maxframe) for maxframe in framegroup))
+
+                batchfile = filesdir + filename + \
+                    "_batchrender_frames_" + first_frame + "-" + last_frame \
+                    + ".txt"
+                lx.out("Saving renderbatch at: " + batchfile)
+
+                template = """log.toConsole true
 log.toConsoleRolling true
 scene.open """ + fullpath + """
 pref.value render.threads auto
@@ -92,24 +117,53 @@ item.channel last """ + last_frame + """
 scene.close
 app.quit
 """
-        f = open(batchfile, 'w')
-        f.write(template)
-        f.close()
+                f = open(batchfile, 'w')
+                f.write(template)
+                f.close()
 
-        renderbatch = " < " + batchfile
+                s.write(headless_path + " < " + batchfile + "\n")
 
-        # Broken at the moment. I'm resorting to simply opening a Terminal window and
-        # copying the necessary command to the clipboard
+            s.close()
+            os.chmod(shellfile, 0755)
 
-        # subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n',
-        # '--args', headless_path, '<', batchfile])
+            pyperclip.copy(headless_path + " < " + shellfile)
+            subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n'])
 
-        pyperclip.copy(headless_path + " < " + batchfile)
-        subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n'])
+        else:
+
+            batchfile = batchdir + filename + \
+                    "_batchrender_frames_" + first_frame + "-" + last_frame \
+                    + ".txt"
+            lx.out("Saving renderbatch at: " + batchfile)
+
+            template = """log.toConsole true
+log.toConsoleRolling true
+scene.open """ + fullpath + """
+pref.value render.threads auto
+select.Item Render
+item.channel step """ + frame_step + """
+item.channel first """ + first_frame + """
+item.channel last """ + last_frame + """
+""" + rendercmd + """
+scene.close
+app.quit
+"""
+            f = open(batchfile, 'w')
+            f.write(template)
+            f.close()
+
+            renderbatch = " < " + batchfile
+
+            # Broken at the moment. I'm resorting to simply opening a Terminal window and
+            # copying the necessary command to the clipboard
+
+            # subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n',
+            # '--args', headless_path, '<', batchfile])
+
+            pyperclip.copy(headless_path + " < " + batchfile)
+            subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n'])
 
     bd_utils.restoreSelection(save_selection)
-
-
 
 # END MAIN PROGRAM -----------------------------------------------
 
@@ -122,10 +176,13 @@ if __name__ == '__main__':
         # and returns an array of arguments for easier 
         # processing.
 
-        argsAsString = lx.arg()
+        argsAsString = int(lx.arg())
         argsAsTuple = lx.args()
 
-        main()
+        if not argsAsString:
+            main()
+        else:
+            main(argsAsString)
 
     except:
         lx.out(traceback.format_exc())
