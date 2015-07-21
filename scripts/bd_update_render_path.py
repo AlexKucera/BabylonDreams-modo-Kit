@@ -32,6 +32,9 @@ import bd_outputPattern
 # END FUNCTIONS -----------------------------------------------
 
 # MAIN PROGRAM --------------------------------------------
+import pyModo
+
+
 def main():
 
     save_selection = lx.evalN("query sceneservice selection ? all")
@@ -77,6 +80,7 @@ def main():
             for x in renderoutputs:
 
                 lx.eval("select.Item \"%s\"" % x)
+                outputname = pyModo.Item_Name_Get(x)
                 filepath = lx.eval("item.channel renderOutput$filename ?")
                 enabled = lx.eval("shader.setVisible \"%s\" ?" % x)
 
@@ -87,13 +91,13 @@ def main():
                     if fileformat is None or "$FLEX":
                         fileformat = "openexr"
 
-                    if x == "rgba":
+                    if outputname == "rgba":
                         renderpasspath = renderpath
                     else:
-                        renderpasspath = renderpath + x + "/"
+                        renderpasspath = renderpath + outputname + "/"
 
                     renderoutputpath = renderpasspath + filename + "_" + version + "_"
-                    lx.out("RenderOutput " + x + " will be located at: " +
+                    lx.out("RenderOutput " + outputname + " will be located at: " +
                            renderpasspath)
                     bd_utils.makes_path(renderpasspath)
                     lx.out("Setting Render Output path to: " + renderoutputpath)
@@ -104,7 +108,7 @@ def main():
                 else:
                     
                     lx.out("Skipping %s as it is either disabled or has no \"PATH\" "
-                           "filled in" % x)
+                           "filled in" % outputname)
 
         bd_outputPattern.main()
 
