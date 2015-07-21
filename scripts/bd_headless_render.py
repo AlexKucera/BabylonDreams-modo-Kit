@@ -176,13 +176,13 @@ if __name__ == '__main__':
         # and returns an array of arguments for easier 
         # processing.
 
-        argsAsString = int(lx.arg())
+        argsAsString = lx.arg()
         argsAsTuple = lx.args()
 
         if not argsAsString:
             main()
         else:
-            main(argsAsString)
+            main(int(argsAsString))
 
     except:
         lx.out(traceback.format_exc())
