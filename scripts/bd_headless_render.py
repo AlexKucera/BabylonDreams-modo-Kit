@@ -14,6 +14,17 @@ window and copy the required command into the systems clipboard.
 
 
 V0.1 Initial Release - 2015-05-19
+V0.2 2015-08-15: Added the ability to time the execution and mail a summary to an email address.
+                Requires http://caspian.dotconf.net/menu/Software/SendEmail/
+                Also requires a config file and the setup of the global variable
+                "mail_config_path" right after the import statements.
+
+                The config file has the following syntax:
+                TO_ADDRESS="mail@server.com"
+                FROM_ADDRESS="mail@server.com"
+                SERVER="mail.server.com:port"
+                USER="mail@server.com"
+                PASS="password"
 
 """
 from itertools import izip_longest
@@ -24,6 +35,8 @@ import traceback
 import bd_utils
 import lx
 import pyperclip
+
+mail_config_path = "/Volumes/ProjectsRaid/x_Pipeline/Scripting/tinkertoys/bash/mail_send.conf"
 
 
 # FUNCTIONS -----------------------------------------------
@@ -88,7 +101,16 @@ def main(batchsize=None):
 
             shellfile = batchdir + filename + "_batchrender.sh"
             s = open(shellfile, 'w')
-            s.write("#!/usr/bin/env bash\n\n")
+            s.write("""#!/usr/bin/env bash
+
+source """ + mail_config_path + """
+SUBJECT="modo render completed"
+
+
+START=$(date +%s)
+STARTDATE=$(date -j -f "%s" "`date +%s`" "+%A, %d.%m.%Y %T")
+
+""")
 
             filesdir = workingdirectory + "work/modo/05_render/_batch/" + filename + "/"
             bd_utils.makes_path(filesdir)
@@ -123,6 +145,16 @@ app.quit
 
                 s.write(headless_path + " < " + batchfile + "\n")
 
+            s.write("""
+END=$(date +%s)
+ENDDATE=$(date -j -f "%s" "`date +%s`" "+%A, %d.%m.%Y %T")
+secs=$((END-START))
+DURATION=$(printf '%dh:%02dm:%02ds' $(($secs/3600)) $(($secs%3600/60)) $(($secs%60)))
+
+BODY="A render (""" + filename + """) just completed. It started at ${STARTDATE}"""
+ + """and ended at ${ENDDATE} taking ${DURATION} overall."
+
+sendemail -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -m ${BODY} -u ${SUBJECT} -s ${SERVER} -xu ${USER} -xp ${PASS}""")
             s.close()
             os.chmod(shellfile, 0755)
 
