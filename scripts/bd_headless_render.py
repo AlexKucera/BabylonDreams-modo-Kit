@@ -105,6 +105,7 @@ def main(batchsize=None):
 
 source """ + mail_config_path + """
 SUBJECT="modo render completed"
+MACHINE=$(hostname -s)
 
 
 START=$(date +%s)
@@ -151,14 +152,15 @@ ENDDATE=$(date -j -f "%s" "`date +%s`" "+%A, %d.%m.%Y %T")
 secs=$((END-START))
 DURATION=$(printf '%dh:%02dm:%02ds' $(($secs/3600)) $(($secs%3600/60)) $(($secs%60)))
 
-BODY="A render (""" + filename + """) just completed. It started at ${STARTDATE}"""
+BODY="${MACHINE} just finished rendering """ + filename + """.
+It started at ${STARTDATE}"""
  + """and ended at ${ENDDATE} taking ${DURATION} overall."
 
 sendemail -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -m ${BODY} -u ${SUBJECT} -s ${SERVER} -xu ${USER} -xp ${PASS}""")
             s.close()
             os.chmod(shellfile, 0755)
 
-            pyperclip.copy(headless_path + " < " + shellfile)
+            pyperclip.copy(shellfile)
             subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n'])
 
         else:
