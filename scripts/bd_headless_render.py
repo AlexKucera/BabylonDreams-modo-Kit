@@ -154,7 +154,7 @@ DURATION=$(printf '%dh:%02dm:%02ds' $(($secs/3600)) $(($secs%3600/60)) $(($secs%
 
 BODY="${MACHINE} just finished rendering """ + filename + """.
 It started at ${STARTDATE}"""
- + """and ended at ${ENDDATE} taking ${DURATION} overall."
+ + """ and ended at ${ENDDATE} taking ${DURATION} overall."
 
 sendemail -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -m ${BODY} -u ${SUBJECT} -s ${SERVER} -xu ${USER} -xp ${PASS}""")
             s.close()
