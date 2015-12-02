@@ -81,6 +81,8 @@ def main():
 
                 lx.eval("select.Item \"%s\"" % x)
                 outputname = pyModo.Item_Name_Get(x)
+                outputtype = lx.eval('shader.setEffect ?')
+
                 filepath = lx.eval("item.channel renderOutput$filename ?")
                 enabled = lx.eval("shader.setVisible \"%s\" ?" % x)
 
@@ -89,7 +91,12 @@ def main():
                     fileformat = lx.eval("item.channel renderOutput$format ?")
 
                     if fileformat is None or "$FLEX":
-                        fileformat = "openexr"
+                        if outputtype == "shade.normal" or outputtype == "geo.world" or\
+                                        outputtype == "geo.uv" or \
+                                    outputtype == "depth" or outputtype == "motion":
+                            fileformat = "openexr_32"
+                        else:
+                            fileformat = "openexr"
 
                     if outputname == "rgba":
                         renderpasspath = renderpath
