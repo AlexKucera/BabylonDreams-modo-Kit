@@ -45,8 +45,10 @@ def grouper(iterable, n, fillvalue=''):
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
+
 def chunker(seq, size):
     return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
+
 
 # END FUNCTIONS -----------------------------------------------
 
@@ -75,6 +77,8 @@ def main(batchsize=None):
 
     pyModo.Render_Count_All()
 
+    pathaliases = bd_utils.pathAliases()
+
     for group in groups:
 
         if group == "passes":
@@ -97,11 +101,9 @@ def main(batchsize=None):
         batchdir = workingdirectory + "work/modo/05_render/_batch/"
         bd_utils.makes_path(batchdir)
 
-        if batchsize:
-
-            shellfile = batchdir + filename + "_batchrender.sh"
-            s = open(shellfile, 'w')
-            s.write("""#!/usr/bin/env bash
+        shellfile = batchdir + filename + "_batchrender.sh"
+        s = open(shellfile, 'w')
+        s.write("""#!/usr/bin/env bash
 
 source """ + mail_config_path + """
 SUBJECT="modo render completed"
@@ -110,11 +112,14 @@ MACHINE=$(hostname -s)
 
 START=$(date +%s)
 STARTDATE=$(date -j -f "%s" "`date +%s`" "+%A, %d.%m.%Y %T")
+FRAMES=$((""" + last_frame + """-""" + first_frame + """+1))
 
 """)
 
-            filesdir = workingdirectory + "work/modo/05_render/_batch/" + filename + "/"
-            bd_utils.makes_path(filesdir)
+        filesdir = workingdirectory + "work/modo/05_render/_batch/" + filename + "/"
+        bd_utils.makes_path(filesdir)
+
+        if batchsize:
 
             framelist = range(int(first_frame), int(last_frame) + 1, int(frame_step))
             framelist = chunker(framelist, batchsize)
@@ -124,12 +129,18 @@ STARTDATE=$(date -j -f "%s" "`date +%s`" "+%A, %d.%m.%Y %T")
                 last_frame = str(max(int(maxframe) for maxframe in framegroup))
 
                 batchfile = filesdir + filename + \
-                    "_batchrender_frames_" + first_frame + "-" + last_frame \
-                    + ".txt"
+                            "_batchrender_frames_" + first_frame + "-" + last_frame \
+                            + ".txt"
                 lx.out("Saving renderbatch at: " + batchfile)
 
                 template = """log.toConsole true
-log.toConsoleRolling true
+log.toConsoleRolling true"""
+
+                for alias, path in pathaliases.iteritems():
+                    template = template + """
+pathalias.create """ + alias + " \"" + path + "\""
+
+                template = template + """
 scene.open """ + fullpath + """
 pref.value render.threads auto
 select.Item Render
@@ -146,32 +157,21 @@ app.quit
 
                 s.write(headless_path + " < " + batchfile + "\n")
 
-            s.write("""
-END=$(date +%s)
-ENDDATE=$(date -j -f "%s" "`date +%s`" "+%A, %d.%m.%Y %T")
-secs=$((END-START))
-DURATION=$(printf '%dh:%02dm:%02ds' $(($secs/3600)) $(($secs%3600/60)) $(($secs%60)))
-
-BODY="${MACHINE} just finished rendering """ + filename + """.
-It started at ${STARTDATE}"""
- + """ and ended at ${ENDDATE} taking ${DURATION} overall."
-
-sendemail -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -m ${BODY} -u ${SUBJECT} -s ${SERVER} -xu ${USER} -xp ${PASS}""")
-            s.close()
-            os.chmod(shellfile, 0755)
-
-            pyperclip.copy(shellfile)
-            subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n'])
-
         else:
 
-            batchfile = batchdir + filename + \
-                    "_batchrender_frames_" + first_frame + "-" + last_frame \
-                    + ".txt"
+            batchfile = filesdir + filename + \
+                        "_batchrender_frames_" + first_frame + "-" + last_frame \
+                        + ".txt"
             lx.out("Saving renderbatch at: " + batchfile)
 
             template = """log.toConsole true
-log.toConsoleRolling true
+log.toConsoleRolling true"""
+
+            for alias, path in pathaliases.iteritems():
+                template = template + """
+pathalias.create """ + alias + " \"" + path + "\""
+
+            template = template + """
 scene.open """ + fullpath + """
 pref.value render.threads auto
 select.Item Render
@@ -186,18 +186,30 @@ app.quit
             f.write(template)
             f.close()
 
-            renderbatch = " < " + batchfile
+            s.write(headless_path + " < " + batchfile + "\n")
 
-            # Broken at the moment. I'm resorting to simply opening a Terminal window and
-            # copying the necessary command to the clipboard
+        s.write("""
+END=$(date +%s)
+ENDDATE=$(date -j -f "%s" "`date +%s`" "+%A, %d.%m.%Y %T")
+secs=$((END-START))
+perframe=$(($secs/$FRAMES))
+DURATION=$(printf '%dh:%02dm:%02ds' $(($secs/3600)) $(($secs%3600/60)) $(($secs%60)))
+DURATIONPERFRAME=$(printf '%dh:%02dm:%02ds' $(($perframe/3600)) $(($perframe%3600/60)) $(($perframe%60)))
 
-            # subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n',
-            # '--args', headless_path, '<', batchfile])
+BODY="${MACHINE} just finished rendering """ + filename + """.
+It started at ${STARTDATE}"""
+                + """ and ended at ${ENDDATE} taking ${DURATION} overall for ${FRAMES} frames.
+That's ${DURATIONPERFRAME} per frame on average."
 
-            pyperclip.copy(headless_path + " < " + batchfile)
-            subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n'])
+sendemail -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -m ${BODY} -u ${SUBJECT} -s ${SERVER} -xu ${USER} -xp ${PASS}""")
+        s.close()
+        os.chmod(shellfile, 0755)
+
+        pyperclip.copy(shellfile)
+        subprocess.Popen(['open', '-a', '/Applications/Utilities/Terminal.app', '-n'])
 
     bd_utils.restoreSelection(save_selection)
+
 
 # END MAIN PROGRAM -----------------------------------------------
 
