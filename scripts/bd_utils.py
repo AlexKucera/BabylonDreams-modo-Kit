@@ -16,11 +16,13 @@ V0.1 Initial Release
 
 import os
 import sys
-
+from bs4 import BeautifulSoup
 import lx
 
 
 # FUNCTIONS -----------------------------------------------
+
+
 
 def restoreSelection(listSelections):
     """
@@ -120,5 +122,27 @@ def filePath():
     else:
         return False
 
+
+def pathAliases():
+    """
+    Returns all PathAliases as dictionary pair.
+
+    """
+
+    config = lx.eval("query platformservice path.path ? configname")
+    soup = BeautifulSoup(open(config))
+    config_pathaliases = soup.find(type='PathAliases')
+    config_pathaliases = config_pathaliases.find_all(type='Alias')
+
+    pathaliases = {}
+
+    for alias in config_pathaliases:
+        alias_alias = alias['key']
+        for string in alias.atom.strings:
+            alias_path = string
+
+        pathaliases[alias_alias] = alias_path
+
+    return pathaliases
 
 # END FUNCTIONS -----------------------------------------------
