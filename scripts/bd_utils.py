@@ -129,6 +129,8 @@ def pathAliases():
 
     """
 
+    lx.eval("config.save")
+
     config = lx.eval("query platformservice path.path ? configname")
     soup = BeautifulSoup(open(config))
     config_pathaliases = soup.find(type='PathAliases')
