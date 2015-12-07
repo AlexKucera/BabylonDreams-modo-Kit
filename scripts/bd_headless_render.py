@@ -77,7 +77,7 @@ def main(batchsize=None):
 
     pyModo.Render_Count_All()
 
-    pathaliases = bd_utils.pathAliases()
+    pathaliases = bd_utils.pathAliases(ask=False)
 
     for group in groups:
 

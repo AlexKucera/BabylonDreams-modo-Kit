@@ -123,13 +123,33 @@ def filePath():
         return False
 
 
-def pathAliases():
+def pathAliases(ask=True):
     """
     Returns all PathAliases as dictionary pair.
 
     """
 
-    lx.eval("config.save")
+    if ask:
+        try:
+            # set up the dialog
+            lx.eval('dialog.setup yesNo')
+            lx.eval('dialog.title {Confirm Operation}')
+            lx.eval('dialog.msg {Save the modo config before getting the PathAliases?}')
+            lx.eval('dialog.result ok')
+
+            # Open the dialog and see which button was pressed
+            lx.eval('dialog.open')
+            lx.eval("dialog.result ?")
+            lx.eval("config.save")
+            lx.out("Proceeding with saved config.")
+
+        except:
+            lx.out("Proceeding without saved config.")
+    else:
+        lx.eval("config.save")
+        lx.out("Saved config.")
+
+
 
     config = lx.eval("query platformservice path.path ? configname")
     soup = BeautifulSoup(open(config))
