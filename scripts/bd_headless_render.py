@@ -79,6 +79,8 @@ def main(batchsize=None):
 
     pathaliases = bd_utils.pathAliases(ask=False)
 
+    bd_utils.renderRegionCheck()
+
     for group in groups:
 
         if group == "passes":

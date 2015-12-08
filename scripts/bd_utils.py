@@ -167,4 +167,30 @@ def pathAliases(ask=True):
 
     return pathaliases
 
+
+def renderRegionCheck():
+
+    lx.eval("select.Item Render")
+    region_state = lx.eval("item.channel polyRender$region ?")
+    if region_state:
+        try:
+            # set up the dialog
+            lx.eval('dialog.setup yesNo')
+            lx.eval('dialog.title {Confirm Operation}')
+            lx.eval('dialog.msg {Disable Render Region for batch render?}')
+            lx.eval('dialog.result ok')
+
+            # Open the dialog and see which button was pressed
+            lx.eval('dialog.open')
+            lx.eval("dialog.result ?")
+            lx.eval("select.Item Render")
+            lx.eval("item.channel polyRender$region 0")
+            lx.eval("scene.save")
+            lx.out("Proceeding without Render Region.")
+
+
+        except:
+            lx.out("Proceeding with enabled Render Region.")
+
+
 # END FUNCTIONS -----------------------------------------------
