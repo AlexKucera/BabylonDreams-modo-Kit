@@ -81,41 +81,50 @@ def main():
 
                 lx.eval("select.Item \"%s\"" % x)
                 outputname = pyModo.Item_Name_Get(x)
-                outputtype = lx.eval('shader.setEffect ?')
 
-                filepath = lx.eval("item.channel renderOutput$filename ?")
-                enabled = lx.eval("shader.setVisible \"%s\" ?" % x)
+                if ' ' in outputname:
 
-                if filepath is not None and enabled:
-
-                    fileformat = lx.eval("item.channel renderOutput$format ?")
-
-                    if fileformat is None or "$FLEX":
-                        if outputtype == "shade.normal" or outputtype == "geo.world" or\
-                                        outputtype == "geo.uv" or \
-                                    outputtype == "depth" or outputtype == "motion":
-                            fileformat = "openexr_32"
-                        else:
-                            fileformat = "openexr"
-
-                    if outputname == "rgba":
-                        renderpasspath = renderpath
-                    else:
-                        renderpasspath = renderpath + outputname + "/"
-
-                    renderoutputpath = renderpasspath + filename + "_" + version + "_"
-                    lx.out("RenderOutput " + outputname + " will be located at: " +
-                           renderpasspath)
-                    bd_utils.makes_path(renderpasspath)
-                    lx.out("Setting Render Output path to: " + renderoutputpath)
-                    lx.eval("item.channel renderOutput$filename " + renderoutputpath)
-                    lx.out("Setting Render Output format to: " + fileformat)
-                    lx.eval("item.channel renderOutput$format " + fileformat)
+                    lx.out("Please use no spaces in renderOutput naming (The offending "
+                           "output is " + outputname + "). It just screws everything up sooner or later.")
+                    return
 
                 else:
-                    
-                    lx.out("Skipping %s as it is either disabled or has no \"PATH\" "
-                           "filled in" % outputname)
+
+                    outputtype = lx.eval('shader.setEffect ?')
+
+                    filepath = lx.eval("item.channel renderOutput$filename ?")
+                    enabled = lx.eval("shader.setVisible \"%s\" ?" % x)
+
+                    if filepath is not None and enabled:
+
+                        fileformat = lx.eval("item.channel renderOutput$format ?")
+
+                        if fileformat is None or "$FLEX":
+                            if outputtype == "shade.normal" or outputtype == "geo.world" or\
+                                            outputtype == "geo.uv" or \
+                                        outputtype == "depth" or outputtype == "motion":
+                                fileformat = "openexr_32"
+                            else:
+                                fileformat = "openexr"
+
+                        if outputname == "rgba":
+                            renderpasspath = renderpath
+                        else:
+                            renderpasspath = renderpath + outputname + "/"
+
+                        renderoutputpath = renderpasspath + filename + "_" + version + "_"
+                        lx.out("RenderOutput " + outputname + " will be located at: " +
+                               renderpasspath)
+                        bd_utils.makes_path(renderpasspath)
+                        lx.out("Setting Render Output path to: " + renderoutputpath)
+                        lx.eval("item.channel renderOutput$filename " + renderoutputpath)
+                        lx.out("Setting Render Output format to: " + fileformat)
+                        lx.eval("item.channel renderOutput$format " + fileformat)
+
+                    else:
+
+                        lx.out("Skipping %s as it is either disabled or has no \"PATH\" "
+                               "filled in" % outputname)
 
         bd_outputPattern.main()
 
