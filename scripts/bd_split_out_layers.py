@@ -27,6 +27,10 @@ def addmask(id, name, type):
 
     _name = lx.eval('texture.name ?')
     plaintype = type.split(".")
+
+    if ' ' in _name:
+        _name = "_".join(_name.split())
+
     _name = _name + "." + plaintype[1]
 
     lx.eval('texture.name {%s}' % _name)
@@ -89,6 +93,7 @@ def main():
                 'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true '
                 'open:true')
         lx.out("ERROR failed with ", sys.exc_info())
+
 
 # END MAIN PROGRAM -----------------------------------------------
 
