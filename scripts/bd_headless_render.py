@@ -77,7 +77,22 @@ def main(batchsize=None):
 
     pyModo.Render_Count_All()
 
-    pathaliases = bd_utils.pathAliases(ask=False)
+    try:
+        # set up the dialog
+        lx.eval('dialog.setup yesNo')
+        lx.eval('dialog.title {Confirm Operation}')
+        lx.eval('dialog.msg {Try to query newer PathAliases?}')
+        lx.eval('dialog.result ok')
+
+        # Open the dialog and see which button was pressed
+        lx.eval('dialog.open')
+        lx.eval("dialog.result ?")
+        pathaliases = bd_utils.pathAliases(ask=False)
+
+    except:
+
+        pathaliases = ""
+
 
     bd_utils.renderRegionCheck()
 
@@ -169,8 +184,9 @@ app.quit
             template = """log.toConsole true
 log.toConsoleRolling true"""
 
-            for alias, path in pathaliases.iteritems():
-                template = template + """
+            if pathaliases is not "":
+                for alias, path in pathaliases.iteritems():
+                    template = template + """
 pathalias.create """ + alias + " \"" + path + "\""
 
             template = template + """
@@ -202,6 +218,16 @@ BODY="${MACHINE} just finished rendering """ + filename + """.
 It started at ${STARTDATE}"""
                 + """ and ended at ${ENDDATE} taking ${DURATION} overall for ${FRAMES} frames.
 That's ${DURATIONPERFRAME} per frame on average."
+
+echo "
+#####
+"
+
+echo $BODY
+
+echo "
+#####
+"
 
 sendemail -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -m ${BODY} -u ${SUBJECT} -s ${SERVER} -xu ${USER} -xp ${PASS}""")
         s.close()
