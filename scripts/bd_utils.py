@@ -13,9 +13,11 @@ Release Notes:
 V0.1 Initial Release
 
 """
-
 import os
 import sys
+
+sys.path.append("/usr/local/lib/python2.7/site-packages")
+
 from bs4 import BeautifulSoup
 import lx
 
@@ -152,6 +154,7 @@ def pathAliases(ask=True):
 
 
     config = lx.eval("query platformservice path.path ? configname")
+    lx.out(config)
     soup = BeautifulSoup(open(config))
     config_pathaliases = soup.find(type='PathAliases')
     config_pathaliases = config_pathaliases.find_all(type='Alias')

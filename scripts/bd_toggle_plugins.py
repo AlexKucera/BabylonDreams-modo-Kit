@@ -23,6 +23,8 @@ V0.2 Added some smarts that finds the kits automatically. No more typing long li
 import fnmatch
 import traceback
 import os
+import sys
+sys.path.append("/usr/local/lib/python2.7/site-packages")
 from bs4 import BeautifulSoup
 import lx
 
