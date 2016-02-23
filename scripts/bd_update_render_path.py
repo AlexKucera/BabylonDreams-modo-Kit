@@ -67,8 +67,8 @@ def main():
 
         # renderpath = workingdirectory + "img/cg/" + turntable + filename + "/" + filename + "_" + version + "/"
 
-        renderpath = workingdirectory + "img/cg/" + filename + "/" + \
-                     filename + "_" + version + "/"
+        renderpath = workingdirectory + "img" + os.sep + "cg" + os.sep + filename + os.sep + \
+                     filename + "_" + version + os.sep
         lx.out("The renders will be located at: " + renderpath)
 
         renderoutputs = bd_utils.get_ids("renderOutput")
@@ -110,7 +110,7 @@ def main():
                         if outputname == "rgba":
                             renderpasspath = renderpath
                         else:
-                            renderpasspath = renderpath + outputname + "/"
+                            renderpasspath = renderpath + outputname + os.sep
 
                         renderoutputpath = renderpasspath + filename + "_" + version + "_"
                         lx.out("RenderOutput " + outputname + " will be located at: " +

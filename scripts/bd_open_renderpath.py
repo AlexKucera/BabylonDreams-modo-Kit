@@ -11,11 +11,12 @@ Release Notes:
 V0.1 Initial Release
 
 """
+import os
 import subprocess
 import traceback
-import platform
 
 import lx
+import sys
 
 import bd_utils
 
@@ -32,17 +33,7 @@ def main():
 
     filename = lx.eval("item.channel renderOutput$filename ?")
 
-    osType = platform.system()
-
-    if osType == "Windows":
-        path = filename.rsplit("\\", 1)
-        return path
-    elif osType == "Darwin":
-        path = filename.rsplit("/", 1)
-        return path
-    else:
-        lx.out("ERROR no valid OS given for path transform")
-        return None
+    path = filename.rsplit(os.sep, 1)
 
     lx.out("Opening path: " + path[0])
 

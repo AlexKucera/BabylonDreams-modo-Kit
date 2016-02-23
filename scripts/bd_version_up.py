@@ -48,7 +48,7 @@ def main():
 
     while created is False:
         version = str(int(version) + 1).zfill(2)
-        newfile = filepath + "/" + filename + "_v" + version + fileextension
+        newfile = filepath + os.sep + filename + "_v" + version + fileextension
         if os.path.isfile(newfile):
             lx.out("Version " + version + " already exists. Increasing version count.")
             pass

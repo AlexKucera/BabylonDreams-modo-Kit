@@ -18,7 +18,7 @@ Release Notes:
 V0.1 Initial Release
 
 """
-
+import os
 import platform
 import traceback
 
@@ -68,11 +68,11 @@ def format_filename(s):
     """
     if osType == "Windows":
         filename = s.replace(unix_path, win_path)
-        filename = filename.replace('/', '\\')
+        filename = filename.replace('/', os.sep)
         return filename
     elif osType == "Darwin":
         filename = s.replace(win_path, unix_path)
-        filename = filename.replace('\\', '/')
+        filename = filename.replace('\\', os.sep)
         return filename
     else:
         lx.out("ERROR no valid OS given for path transform")
