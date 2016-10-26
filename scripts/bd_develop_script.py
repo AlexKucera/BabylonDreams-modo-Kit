@@ -20,8 +20,10 @@ V0.1 Initial Release - 2015-05-19
 """
 
 import traceback
-import lx
-import bd_copy_to_system_clipboard  # Import the script here
+import modo, lx, lxu, lxifc
+import sys
+import bd_link_transforms  # Import the script here
+
 
 
 # FUNCTIONS -----------------------------------------------
@@ -31,6 +33,7 @@ import bd_copy_to_system_clipboard  # Import the script here
 # MAIN PROGRAM --------------------------------------------
 def main():
     pass
+
 
 # END MAIN PROGRAM -----------------------------------------------
 
@@ -46,7 +49,7 @@ if __name__ == '__main__':
         argsAsString = lx.arg()
         argsAsTuple = lx.args()
 
-        bd_copy_to_system_clipboard.main()  # call the script with any arguments here.
+        bd_link_transforms.main()  # call the script with any arguments here.
 
     except:
         lx.out(traceback.format_exc())

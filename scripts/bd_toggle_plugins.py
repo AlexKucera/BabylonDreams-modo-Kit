@@ -32,6 +32,8 @@ exclude = ['XSR', 'babylondreams', 'mecco_snap', 'lux_ffmpeg_export']
 
 kits = []
 
+lx.out("Starting")
+
 # Grab all kits based on modo's environment
 importpaths = lx.eval("query platformservice importpaths ?")
 for paths in importpaths:
