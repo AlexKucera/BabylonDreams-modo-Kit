@@ -14,6 +14,7 @@ http://www.mechanicalcolor.com/modo-kits/render-monkey
 Release Notes:
 
 V0.1 Initial Release - 2016-11-23
+v0.2 Trigger GL Recording and close the window after recording has finished - 2016-11-24
 
 """
 
@@ -110,6 +111,15 @@ def main():
     else:
         percent = 1
 
+    lx.eval("user.defNew gl_type integer momentary")
+    lx.eval('user.def gl_type username "GL Recording Type"')
+    lx.eval('user.def gl_type dialogname "Do you want to capture a movie or an image sequence?"')
+    lx.eval("user.def gl_type list movie;image")
+    lx.eval('user.def gl_type listnames "Movie;Image Sequence"')
+    lx.eval("user.value gl_type")
+
+    gl_type = lx.eval("user.value gl_type ?")
+
     all_cameras = get_ids("camera")
     render_camera = lx.eval("render.camera ?")
 
@@ -172,6 +182,14 @@ def main():
     lx.eval('view3d.cameraItem ' + capture_camera)
     lx.eval('view3d.shadingStyle gnzgl')
     lx.eval('view3d.sameAsActive true')
+
+    if gl_type == "movie":
+        lx.eval("gl.capture")
+    if gl_type == "image":
+        lx.eval("gl.capture seq:true")
+
+    lx.eval("layout.closeWindow")
+
 
 
 # END MAIN PROGRAM -----------------------------------------------
