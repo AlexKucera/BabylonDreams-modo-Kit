@@ -14,6 +14,7 @@ http://www.mechanicalcolor.com/modo-kits/render-monkey
 Release Notes:
 
 V0.1 Initial Release - 2016-11-23
+v0.2 Trigger GL Recording and close the window after recording has finished - 2016-11-24
 
 """
 
@@ -110,6 +111,15 @@ def main():
     else:
         percent = 1
 
+    lx.eval("user.defNew gl_type integer momentary")
+    lx.eval('user.def gl_type username "GL Recording Type"')
+    lx.eval('user.def gl_type dialogname "Do you want to capture a movie or an image sequence?"')
+    lx.eval("user.def gl_type list movie;image")
+    lx.eval('user.def gl_type listnames "Movie;Image Sequence"')
+    lx.eval("user.value gl_type")
+
+    gl_type = lx.eval("user.value gl_type ?")
+
     all_cameras = get_ids("camera")
     render_camera = lx.eval("render.camera ?")
 
@@ -137,6 +147,15 @@ def main():
     capture_camera_name = lx.eval('query sceneservice item.name ? %s' % capture_camera)
     lx.out(capture_camera)
     lx.out(capture_camera_name)
+
+    lx.eval("user.defNew shading_style integer momentary")
+    lx.eval('user.def shading_style username "Pick Viewport Shading"')
+    lx.eval('user.def shading_style dialogname "Which Shading Style do you want?"')
+    lx.eval("user.def shading_style list gnzgl;advgl;texmod;tex;shade;vmap;sket;wire;shd1;shd2;shd3")
+    lx.eval('user.def shading_style listnames "Advanced;Default;Texture Shaded;Texture;Shaded;Vertex Map;Solid;Wireframe;Gooch Toon Shading;Cel Shading;Reflection"')
+    lx.eval("user.value shading_style")
+
+    shading_style = lx.eval("user.value shading_style ?")
 
     # Get selection
     save_selection = lx.evalN("query sceneservice selection ? all")
@@ -167,11 +186,33 @@ def main():
     lx.eval('view3d.fillSelected false')
     lx.eval('view3d.outlineSelected false')
     lx.eval('view3d.showSelectionRollover false')
-    lx.eval('view3d.shadingStyle advgl active')
+    lx.eval('view3d.shadingStyle ' + shading_style + ' active')
     lx.eval('view3d.wireframeOverlay none active')
     lx.eval('view3d.cameraItem ' + capture_camera)
-    lx.eval('view3d.shadingStyle gnzgl')
+    lx.eval('view3d.shadingStyle ' + shading_style)
     lx.eval('view3d.sameAsActive true')
+
+    if shading_style == "gnzgl":
+        lx.eval("view3d.showGnzFSAA x9")
+        lx.eval("view3d.setGnzTransparency correct")
+        lx.eval("view3d.setGnzSSReflections blurry")
+        lx.eval("view3d.setGnzDitherMode ordered")
+        lx.eval("view3d.showGnzSSAO true")
+        lx.eval("view3d.GnzVisOverride all")
+        lx.eval("view3d.showGnzShadows true")
+        lx.eval("view3d.useGnzNormalMaps true")
+        lx.eval("view3d.useGnzBumpMaps true")
+        lx.eval("view3d.setGnzVisibility render")
+        lx.eval("view3d.setGnzLighting sceneIBLLights")
+        lx.eval("view3d.setGnzBackground environment")
+
+    if gl_type == "movie":
+        lx.eval("gl.capture")
+    if gl_type == "image":
+        lx.eval("gl.capture seq:true")
+
+    lx.eval("layout.closeWindow")
+
 
 
 # END MAIN PROGRAM -----------------------------------------------
