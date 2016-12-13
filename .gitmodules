@@ -1,0 +1,3 @@
+[submodule "scripts/commander"]
+	path = scripts/commander
+	url = git@github.com:adamohern/commander.git
