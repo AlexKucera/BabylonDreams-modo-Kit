@@ -18,7 +18,6 @@ import sys
 
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 
-from bs4 import BeautifulSoup
 import lx
 
 
@@ -130,7 +129,7 @@ def pathAliases(ask=True):
     Returns all PathAliases as dictionary pair.
 
     """
-
+    from bs4 import BeautifulSoup
     if ask:
         try:
             # set up the dialog
