@@ -22,7 +22,7 @@ V0.1 Initial Release - 2015-05-19
 import traceback
 import modo, lx, lxu, lxifc
 import sys
-import bd_record_gl_capture  # Import the script here
+import bd_x_shading  # Import the script here
 
 
 
@@ -49,8 +49,8 @@ if __name__ == '__main__':
         argsAsString = lx.arg()
         argsAsTuple = lx.args()
 
-        reload(bd_record_gl_capture)
-        bd_record_gl_capture.main()  # call the script with any arguments here.
+        reload(bd_x_shading)
+        bd_x_shading.main()  # call the script with any arguments here.
 
     except:
         lx.out(traceback.format_exc())
