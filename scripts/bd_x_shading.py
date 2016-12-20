@@ -35,8 +35,8 @@ def main():
     lx.eval("user.defNew scene_chooser integer momentary")
     lx.eval('user.def scene_chooser username "Scene Chooser"')
     lx.eval('user.def scene_chooser dialogname "Which shading mode do you want to use?"')
-    lx.eval("user.def scene_chooser list {0};{1}".format(shading_scenes[0], shading_scenes[1]))
-    lx.eval('user.def scene_chooser listnames "Animation;Rendering"')
+    lx.eval("user.def scene_chooser list {0};{1};{2}".format(shading_scenes[0], shading_scenes[1], "clear"))
+    lx.eval('user.def scene_chooser listnames "Animation;Rendering;Clear Shading"')
     lx.eval("user.value scene_chooser")
 
     mode = lx.eval("user.value scene_chooser ?")
@@ -58,29 +58,20 @@ def main():
             try:
                 safe_item = modo.Item(item.id)
                 if safe_item:
-                    lx.eval("item.delete item:{%s}" % safe_item.id)
+                    lx.eval("!item.delete item:{%s}" % safe_item.id)
             except:
                 continue
-            lx.eval("!item.delete item:{0}".format(item.name))
 
     # Now we have a clean slate and can import our new or updated shading setup.
-    lx.eval("scene.open {0}{1}{2} import".format(shading_path, mode, shading_format))
+    if mode != "clear":
+        lx.eval("scene.open {0}{1}{2} import".format(shading_path, mode, shading_format))
 
-    masks = scene.items(itype='mask', superType=True)
-    for mask in masks:
-        if "x_shading" in mask.name:
-            item_selection = modo.item.ItemGraph(item=mask, graphType='shadeLoc').forward()
-            modo.item.ItemGraph(item=mask, graphType='shadeLoc').disconnectInput(item_selection[0])
-            mask.name = '%s_%s' % (mask.type, mode)
-
-    # n = lx.eval('query sceneservice mask.N ? all')
-    # for i in range(n):
-    #     name = lx.eval("query sceneservice mask.name ? %s" % i)
-    #     if name == "x_shading_new (Item)":
-    #         maskid = lx.eval("query sceneservice mask.id ? %s" % i)
-    #         lx.eval("select.Item %s" % maskid)
-    #         lx.eval("mask.setMesh (all)")
-
+        masks = scene.items(itype='mask', superType=True)
+        for mask in masks:
+            if "x_shading" in mask.name:
+                item_selection = modo.item.ItemGraph(item=mask, graphType='shadeLoc').forward()
+                modo.item.ItemGraph(item=mask, graphType='shadeLoc').disconnectInput(item_selection[0])
+                mask.name = '%s_%s' % (mask.type, mode)
 
 # END MAIN PROGRAM -----------------------------------------------
 
