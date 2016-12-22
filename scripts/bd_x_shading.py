@@ -35,8 +35,8 @@ def main():
     lx.eval("user.defNew scene_chooser integer momentary")
     lx.eval('user.def scene_chooser username "Scene Chooser"')
     lx.eval('user.def scene_chooser dialogname "Which shading mode do you want to use?"')
-    lx.eval("user.def scene_chooser list {0};{1};{2}".format(shading_scenes[0], shading_scenes[1], "clear", "open"))
-    lx.eval('user.def scene_chooser listnames "Animation;Rendering;Clear Shading; Open x_shading for editing"')
+    lx.eval("user.def scene_chooser list {0};{1};{2};{3};{4}".format(shading_scenes[0], shading_scenes[1], "clear", shading_scenes[0], shading_scenes[1]))
+    lx.eval('user.def scene_chooser listnames "Animation;Rendering;Clear Shading;Open Animation shading for editing;Open Render shading for editing"')
     lx.eval("user.value scene_chooser")
 
     mode = lx.eval("user.value scene_chooser ?")
