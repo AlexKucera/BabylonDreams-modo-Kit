@@ -35,8 +35,8 @@ def main():
     lx.eval("user.defNew scene_chooser integer momentary")
     lx.eval('user.def scene_chooser username "Scene Chooser"')
     lx.eval('user.def scene_chooser dialogname "Which shading mode do you want to use?"')
-    lx.eval("user.def scene_chooser list {0};{1};{2}".format(shading_scenes[0], shading_scenes[1], "clear"))
-    lx.eval('user.def scene_chooser listnames "Animation;Rendering;Clear Shading"')
+    lx.eval("user.def scene_chooser list {0};{1};{2}".format(shading_scenes[0], shading_scenes[1], "clear", "open"))
+    lx.eval('user.def scene_chooser listnames "Animation;Rendering;Clear Shading; Open x_shading for editing"')
     lx.eval("user.value scene_chooser")
 
     mode = lx.eval("user.value scene_chooser ?")
@@ -61,9 +61,19 @@ def main():
                     lx.eval("!item.delete item:{%s}" % safe_item.id)
             except:
                 continue
+        print "Cleared x_shading out of scene."
 
     # Now we have a clean slate and can import our new or updated shading setup.
-    if mode != "clear":
+    if mode == "clear":
+
+        pass
+
+    elif mode == "open":
+
+        lx.eval("scene.open {0}{1}{2} normal".format(shading_path, mode, shading_format))
+
+    else:
+
         lx.eval("scene.open {0}{1}{2} import".format(shading_path, mode, shading_format))
 
         masks = scene.items(itype='mask', superType=True)
@@ -72,6 +82,7 @@ def main():
                 item_selection = modo.item.ItemGraph(item=mask, graphType='shadeLoc').forward()
                 modo.item.ItemGraph(item=mask, graphType='shadeLoc').disconnectInput(item_selection[0])
                 mask.name = '%s_%s' % (mask.type, mode)
+        print "Imported x_shading."
 
 # END MAIN PROGRAM -----------------------------------------------
 
