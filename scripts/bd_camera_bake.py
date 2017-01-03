@@ -81,7 +81,6 @@ def main():
         lx.eval("?channel.bake 0")
 
         lx.eval("item.selectChannels anim")
-        lx.eval("channel.keyReduce")
 
         scene.select(bake_cam)
 
