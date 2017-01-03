@@ -66,10 +66,11 @@ def main():
         cam.channel("focusDist") >> bake_cam.channel("focusDist")
         cam.channel("fStop") >> bake_cam.channel("fStop")
 
+        # Bake Animation
         scene.select(bake_cam)
         lx.eval("?item.bake 0")
 
-
+        # Bake non-transform channels
         lx.eval("select.drop channel")
         lx.eval("select.channel {{{0}:focalLen}} add".format(bake_cam.id))
         lx.eval("select.channel {{{0}:apertureX}} add".format(bake_cam.id))
@@ -80,19 +81,20 @@ def main():
         lx.eval("select.channel {{{0}:fStop}} add".format(bake_cam.id))
         lx.eval("?channel.bake 0")
 
+        scene.select(bake_cam)
         lx.eval("item.selectChannels anim")
 
-        scene.select(bake_cam)
+        # FBX Export
+        export_value = lx.eval("user.value sceneio.fbx.save.exportType ?")
+        lx.eval("user.value sceneio.fbx.save.exportType FBXExportSelection")
 
-        export_format = bd_utils.queryDialog(listvalues=["Alembic", "FBX"], listnames=["Alembic", "FBX"], query="Choose Export Format", title="Export Format")
-        if export_format == "Alembic":
-            lx.eval("export.selected 3 false false true")
-        elif export_format == "FBX":
-            lx.eval("export.selected 11 false false true")
-        else:
-            print "Invalid Export Format"
+        newpath = os.path.splitext(scene.filename)[0] + ".fbx"
+        print "Exporting to {0}".format(newpath)
+        lx.eval("scene.saveAs {0} fbx true".format(newpath))
 
+        # Cleanup
         scene.removeItems(bake_cam)
+        lx.eval("user.value sceneio.fbx.save.exportType {0}".format(export_value))
 
 
 
