@@ -195,4 +195,30 @@ def renderRegionCheck():
             lx.out("Proceeding with enabled Render Region.")
 
 
+def queryDialog(listvalues=["default"], listnames=["Default"], query="Pick Something", title="Query Dialog"):
+
+    values = ""
+    names = ""
+
+    for value in listvalues:
+        if value.isdigit():
+            print "Please use only Strings and no Integers/Digits for `listvalue`."
+            values = ""
+        else:
+            values += value + ";"
+
+    for name in listnames:
+        names += name + ";"
+
+    lx.eval("user.defNew bd_user_value integer momentary")
+    lx.eval('user.def bd_user_value username "{0}"'.format(query))
+    lx.eval('user.def bd_user_value dialogname "{0}"'.format(title))
+    lx.eval("user.def bd_user_value list {0}".format(values))
+    lx.eval('user.def bd_user_value listnames "{0}"'.format(names))
+    lx.eval("user.value bd_user_value")
+
+    bd_user_value = lx.eval("user.value bd_user_value ?")
+
+    return bd_user_value
+
 # END FUNCTIONS -----------------------------------------------
