@@ -18,16 +18,15 @@ bottom (line 49)
 V0.1 Initial Release - 2015-05-19
 
 """
-
+# import sys
+# sys.path.append('/Volumes/ProjectsRaid/x_Pipeline/Scripting/tinkertoys/python/pycharm-debug.egg')
+# import pydevd
+# pydevd.settrace('localhost', port=35500, stdoutToServer=True, stderrToServer=True, suspend=False)
 import traceback
-import modo, lx, lxu, lxifc
-import sys
+import lx
 import bd_camera_bake  # Import the script here
 
-
-
 # FUNCTIONS -----------------------------------------------
-
 # END FUNCTIONS -----------------------------------------------
 
 # MAIN PROGRAM --------------------------------------------

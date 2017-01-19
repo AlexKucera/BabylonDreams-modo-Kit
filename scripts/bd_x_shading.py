@@ -72,6 +72,8 @@ def main():
                 except:
                     continue
             print "Cleared x_shading out of scene."
+            if mode == "clear":
+                modo.dialogs.alert(title="Cleaned up", message="Cleared x_shading out of scene.")
 
         # Now we have a clean slate and can import our new or updated shading setup.
 
@@ -86,6 +88,7 @@ def main():
                     modo.item.ItemGraph(item=mask, graphType='shadeLoc').disconnectInput(item_selection[0])
                     mask.name = '%s_%s' % (mask.type, mode)
             print "Imported x_shading."
+            modo.dialogs.alert(title="Imported x_shading.", message="Imported {0}".format(mode))
 
 # END MAIN PROGRAM -----------------------------------------------
 

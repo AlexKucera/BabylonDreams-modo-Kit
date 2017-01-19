@@ -95,6 +95,7 @@ def main():
         # Cleanup
         scene.removeItems(bake_cam)
         lx.eval("user.value sceneio.fbx.save.exportType {0}".format(export_value))
+        modo.dialogs.alert(title="Export Finished", message="The camera has been exported to {0}".format(newpath))
 
 
 
