@@ -88,7 +88,7 @@ def main():
         export_value = lx.eval("user.value sceneio.fbx.save.exportType ?")
         lx.eval("user.value sceneio.fbx.save.exportType FBXExportSelection")
 
-        newpath = os.path.splitext(scene.filename)[0] + ".fbx"
+        newpath = os.path.splitext(scene.filename)[0] + "camera_bake.fbx"
         print "Exporting to {0}".format(newpath)
         lx.eval("scene.saveAs {0} fbx true".format(newpath))
 
