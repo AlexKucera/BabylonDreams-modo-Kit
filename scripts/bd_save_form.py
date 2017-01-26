@@ -23,13 +23,13 @@ def main():
     try:
         lx.eval("select.attr {83740604103:sheet} set")
         lx.eval(
-            "attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams/configs/babylondreams_forms.cfg")
+            "attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams-modo-Kit/configs/babylondreams_forms.cfg")
         lx.eval("select.attr {35548411557:sheet} set")
         lx.eval(
-            "attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams/configs/babylondreams_popup_form.cfg")
+            "attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams-modo-Kit/configs/babylondreams_popup_form.cfg")
         lx.out("Successfully saved KIT UI Config!")
         lx.eval("select.attr {11265178910:sheet} set")
-        lx.eval("attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams/configs/babylondreams_menubar_form.cfg")
+        lx.eval("attr.save /Volumes/ProjectsRaid/x_Pipeline/x_AppPlugins/modo/content/Kits/BabylonDreams-modo-Kit/configs/babylondreams_menubar_form.cfg")
     except:
         lx.eval('layout.createOrClose EventLog "Event Log_layout" '
                 'title:@macros.layouts@EventLog@ width:600 height:600 persistent:true')
