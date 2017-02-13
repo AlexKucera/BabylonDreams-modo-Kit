@@ -24,7 +24,7 @@ V0.1 Initial Release - 2015-05-19
 # pydevd.settrace('localhost', port=35500, stdoutToServer=True, stderrToServer=True, suspend=False)
 import traceback
 import lx
-import bd_camera_bake  # Import the script here
+import bd_copy_paste_channels  # Import the script here
 
 # FUNCTIONS -----------------------------------------------
 # END FUNCTIONS -----------------------------------------------
@@ -48,8 +48,8 @@ if __name__ == '__main__':
         argsAsString = lx.arg()
         argsAsTuple = lx.args()
 
-        reload(bd_camera_bake)
-        bd_camera_bake.main()  # call the script with any arguments here.
+        reload(bd_copy_paste_channels)
+        bd_copy_paste_channels.main()  # call the script with any arguments here.
 
     except:
         lx.out(traceback.format_exc())
