@@ -50,10 +50,12 @@ def get_selected(num=1):
 def main():
     scene = modo.Scene()
 
-    # Find the topmost spot below the renderOutputs
+    # Initialize Variables
     index = 10000000000000000000000  # Set the index to something very high so we can find the lowest index
     firstFrame = scene.renderItem.channel('first').get() / scene.fps
+    chan_set_name = 'blend_channel_set'
 
+    # Find the topmost spot below the renderOutputs
     for item in scene.renderItem.children():
         if item.type == "renderOutput":
             if index > item.parentIndex:
@@ -86,7 +88,7 @@ def main():
 
     # Set the correct Shading Effect
     constant.channel('effect').set('tranAmount')
-    constant.channel('value').set(0.0, time=firstFrame, key=True)
+    constant.channel('value').set(0.0)  # , time=firstFrame, key=True)
 
     # Adjust the Item dropdown in the shading group
     # (yes, it is reverse, we are actually setting the input of the group to be the shading group)
@@ -96,13 +98,13 @@ def main():
     chan_set = False
     for group in scene.getGroups(gtype='chanset'):
 
-        if group.name == 'blend_channel_set':
+        if group.name == chan_set_name:
             chan_set = True
 
     if not chan_set:
-        chan_set = scene.addGroup(name='blend_channel_set', gtype='chanset')
+        chan_set = scene.addGroup(name=chan_set_name, gtype='chanset')
     else:
-        chan_set = scene.item('blend_channel_set')
+        chan_set = scene.item(chan_set_name)
 
     chan_set.addChannel('value', constant)
 
